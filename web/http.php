@@ -1,8 +1,8 @@
 <?php
 
 class HttpResult {
-  private $code
-  private $headers);
+  private $code;
+  private $headers;
   private $body;
   
   public function __construct($code, $body, array $headers) {
@@ -23,7 +23,6 @@ function movedPermanently($url) { return new HttpResult(301, "", array("Location
 function found($url) { return new HttpResult(302, "", array("Location: $url")); }
 function forbidden($body) { return new HttpResult(403, $body, array()); }
 function notFound($body) { return new HttpResult(404, $body, array()); }
-function ok($body) { return new HttpResult(200, $body, array()); }
 function internalServerError($body) { return new HttpResult(500, $body, array()); }
 
 function http_request_uri() {
@@ -32,9 +31,9 @@ function http_request_uri() {
 
 function http_route($url, array $routes) {
   try {
-    $match = match($url, $routes);
+    $match = http_match($url, $routes);
     if (!is_null($match)) {
-      $result = dispatch($match);
+      $result = http_dispatch($match);
     }
     else {
       $result = notFound("<h1>Not Found</h1>");
@@ -56,5 +55,6 @@ function http_match($url, array $routes) {
 }
 
 function http_dispatch(array $match) {
-  return call_user_func($match['f'], $match['matches']);
+  $result = call_user_func($match['f'], $match['matches']);
+  $result->send();
 }
