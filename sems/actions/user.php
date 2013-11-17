@@ -72,7 +72,24 @@ function sems_signup() {
   });
 }
 
-function sems_confirm($code) {
+function sems_confirm_url() { return SEMS_ROOT.'/confirm'; }
+function sems_confirm() {
+  //If NOT logged-in, give 404.
+  $ident = sems_get_identity();
+  if ($ident == null) {
+    return sems_notfound();
+  }
+  
+  return sems_db(function($db) use($ident) {
+    $vars = array();
+    if (count($_POST) > 0) {
+      $n = affect($db, "UPDATE User SET email_sent_flag=b'1' WHERE user_id=?", array($ident->UserId));
+      $vars['confirm_success'] = $n == 1;
+      //Re-set identity whenever something in the user changes
+      sems_set_identity(sems_create_identity($db, $ident->UserId));
+    }
+    return ok(sems_smarty_fetch("confirm.tpl", $vars));
+  });
 }
 
 function sems_profile($uid) {
@@ -86,9 +103,11 @@ function sems_profile_edit($uid) {
 class Identity {
   public $UserId;
   public $Roles;
-  public function __construct($user_id, array $roles) {
+  public $UserData;
+  public function __construct($user_id, array $roles, $data) {
     $this->UserId = $user_id;
     $this->Roles = $roles;
+    $this->UserData = $data;
   }
 }
 
@@ -107,7 +126,14 @@ function sems_clear_identity() {
 
 function sems_create_identity($db, $user_id) {
   $roles = scol($db, "SELECT role FROM UserRole WHERE user_id=?", array($user_id));
-  return new Identity($user_id, $roles);
+  $data = srow($db, "SELECT date_created,title,first_name,middle_name,last_name,country_id,organization_id,department,address,city,province,postcode,email,email_sent_flag,last_event_id FROM User WHERE user_id=?", array($user_id));
+  return new Identity($user_id, $roles, $data);
+}
+
+function sems_identity_data($field) {
+  $ident = sems_get_identity();
+  if ($ident && isset($ident->UserData[$field])) return $ident->UserData[$field];
+  return null;
 }
 
 function sems_hash_password($pwd) {

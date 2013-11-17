@@ -20,7 +20,7 @@ function sems_routes() {
     "|^{$HTTP_ROOT}/login$|" => 'sems_login',
     "|^{$HTTP_ROOT}/logout$|" => 'sems_logout',
     "|^{$HTTP_ROOT}/signup$|" => 'sems_signup',
-    "|^{$HTTP_ROOT}/confirm/(\w+)$|" => 'sems_confirm',
+    "|^{$HTTP_ROOT}/confirm$|" => 'sems_confirm',
     "|^{$HTTP_ROOT}/profile/(\d+)$|" => 'sems_profile',
     "|^{$HTTP_ROOT}/profile/(\d+)/edit$|" => 'sems_profile_edit',
     

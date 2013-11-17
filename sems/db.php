@@ -74,6 +74,15 @@ function scol($db, $sql, array $params=array()) {
   }, $db, $sql, $params, MYSQLI_NUM);
 }
 
+// Return the first row of the resultset.
+function srow($db, $sql, array $params=array()) {
+  return query(function($res) {
+    $firstrow = $res->fetch_array(MYSQLI_ASSOC);
+    if ($firstrow) return $firstrow;
+    return null;
+  }, $db, $sql, $params);
+}
+
 // Return the value of the first column of the first row of the resultset.
 function sone($db, $sql, array $params=array()) {
   return query(function($res) {
