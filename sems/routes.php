@@ -1,7 +1,9 @@
 <?php
 
+include 'actions/user.php';
 include 'actions/conference.php';
 
+define('SEMS_ROOT', '/comp353');
 $HTTP_ROOT = '/comp353';
 
 function sems_routes() {
@@ -19,8 +21,8 @@ function sems_routes() {
     "|^{$HTTP_ROOT}/logout$|" => 'sems_logout',
     "|^{$HTTP_ROOT}/signup$|" => 'sems_signup',
     "|^{$HTTP_ROOT}/confirm/(\w+)$|" => 'sems_confirm',
-    "|^{$HTTP_ROOT}/profile/(\w+)$|" => 'sems_profile',
-    "|^{$HTTP_ROOT}/profile/(\w+)/edit$|" => 'sems_profile_edit',
+    "|^{$HTTP_ROOT}/profile/(\d+)$|" => 'sems_profile',
+    "|^{$HTTP_ROOT}/profile/(\d+)/edit$|" => 'sems_profile_edit',
     
     //Conference routes
     "|^{$HTTP_ROOT}/(\w+)$|" => 'sems_conference',
