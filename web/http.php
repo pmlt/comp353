@@ -40,7 +40,7 @@ function http_route($url, array $routes) {
     }
   }
   catch (Exception $e) {
-    $result = internalServerError("<h1>Internal Server Error</h1><pre>$e</pre>");
+    $result = internalServerError("<h1>Internal Server Error</h1><pre>$e\n{$e->getTraceAsString()}</pre>");
   }
   return $result;
 }
@@ -55,6 +55,6 @@ function http_match($url, array $routes) {
 }
 
 function http_dispatch(array $match) {
-  $result = call_user_func($match['f'], $match['matches']);
-  $result->send();
+  array_shift($match['matches']);
+  return call_user_func_array($match['f'], $match['matches']);
 }
