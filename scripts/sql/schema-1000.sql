@@ -155,7 +155,7 @@ CREATE TABLE `Message` (
 DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
   `user_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `date_created` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_created` DATETIME NOT NULL,
   `title` ENUM('mr','ms','mrs','dr') NOT NULL,
   `first_name` TEXT NOT NULL,
   `middle_name` TEXT NOT NULL,

@@ -34,16 +34,24 @@ function sems_throw_db($db, $prefix) {
   throw new Exception($prefix.": (" . $db->errno . ") " . $db->error);
 }
 
-function generate_insert($db, $table, $fields, $values) {
+function generate_insert($db, $table, $fields, $values, $literal_exceptions=array()) {
   $safe_table = $db->escape_string($table);
   $safe_fields = implode(',', array_map(function($field) use(&$db) {
     return '`'.$db->escape_string($field).'`';
   }, $fields));
-  $safe_placeholders = implode(',', array_map(function($field) { return "?"; }, $fields));
+  $safe_placeholders = implode(',', array_map(function($field) use(&$values,&$literal_exceptions) {
+    if (in_array($field, $literal_exceptions)) {
+      return isset($values[$field]) ? $values[$field] : null;
+    } else {
+      return "?";
+    }
+  }, $fields));
   $sql = "INSERT INTO `$safe_table` ($safe_fields) VALUES ($safe_placeholders)";
   $sqlparams = array();
   foreach ($fields as $field) {
-    $sqlparams[] = isset($values[$field]) ? $values[$field] : null;
+    if (!in_array($field, $literal_exceptions)) {
+      $sqlparams[] = isset($values[$field]) ? $values[$field] : null;
+    }
   }
   return array($sql, $sqlparams);
 }

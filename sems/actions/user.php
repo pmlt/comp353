@@ -56,7 +56,8 @@ function sems_signup() {
         //Create user.
         //Hash password
         $_POST['password'] = sems_hash_password($_POST['password']);
-        list($sql, $sqlparams) = generate_insert($db, "User", array('title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode','email','password'), $_POST);
+        $_POST['date_created'] = 'NOW()'; //This will be interpreted literally
+        list($sql, $sqlparams) = generate_insert($db, "User", array('date_created','title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode','email','password'), $_POST, array('date_created'));
         $user_id = insert($db, $sql, $sqlparams);
         sems_set_identity(sems_create_identity($db, $user_id));
         return found(sems_home_url());
