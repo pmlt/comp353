@@ -56,6 +56,18 @@ function generate_insert($db, $table, $fields, $values, $literal_exceptions=arra
   return array($sql, $sqlparams);
 }
 
+function generate_update($db, $table, $fields, $values) {
+  $safe_table = $db->escape_string($table);
+  $modified_fields = implode(',', array_map(function($field) use(&$db,&$values) {
+    return '`'.$db->escape_string($field).'`=?';
+  }, $fields));
+  $sqlparams = array_map(function($field) use(&$values) {
+    return isset($values[$field]) ? $values[$field] : null;
+  }, $fields);
+  $sql = "UPDATE `{$safe_table}` SET {$modified_fields}";
+  return array($sql,$sqlparams);
+}
+
 function insert($db, $sql, $sqlparams) {
   return query(function($res) use(&$db) {
     return $db->insert_id;
@@ -70,14 +82,14 @@ function affect($db, $sql, $sqlparams) {
 
 // Return the resultset as an array of rows.
 function stable($db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
-  return query(function($res) use($mode) {
-    return $res->fetch_all($mode);
-  }, $db, $sql, $params);
+  return smap(function($row) {
+    return $row;
+  }, $db, $sql, $params, $mode);
 }
 
 // Return the values of the first column of the resultset.
 function scol($db, $sql, array $params=array()) {
-  return smap(function($row, $rowcount) {
+  return smap(function($row) {
     return $row[0];
   }, $db, $sql, $params, MYSQLI_NUM);
 }

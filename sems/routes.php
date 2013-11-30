@@ -59,3 +59,10 @@ function sems_notfound() {
     return notFound($smarty->fetch('notfound.tpl'));
   });
 }
+
+function sems_forbidden() {
+  return sems_smarty(function($smarty) {
+    return forbidden($smarty->fetch('forbidden.tpl'));
+  });
+}
+
