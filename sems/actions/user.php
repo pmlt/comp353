@@ -140,7 +140,7 @@ function sems_profile_edit($uid) {
       $success = sems_validate($_POST, $rules, $errors);
       if ($success) {
         //Edit user data then return to profile
-        list($sql, $sqlparams) = generate_update($db, "User", array('title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode'), $_POST);
+        list($sql, $sqlparams) = generate_update($db, "User", array('title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode'), $_POST, qeq('user_id', $ident->UserId));
         $rows_affected = affect($db, $sql, $sqlparams);
         sems_set_identity(sems_create_identity($db, $ident->UserId));
         return found(sems_profile_url($ident->UserId));

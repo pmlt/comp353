@@ -34,6 +34,30 @@ function sems_throw_db($db, $prefix) {
   throw new Exception($prefix.": (" . $db->errno . ") " . $db->error);
 }
 
+class SqlCond {
+  public $sql = "";
+  public $params = array();
+  public function __construct($sql, $params) {
+    $this->sql = $sql;
+    $this->params = $params;
+  }
+}
+
+function qeq($field, $value) { return qcond('=', $field, $value); }
+function qcond($op, $field, $value) {
+  return new SqlCond("$field = ?", array($value));
+}
+function qand(array $conds) { return qgroup('AND', $conds); }
+function qor(array $conds) { return qgroup('OR', $conds); }
+function qgroup($separator, array $conds) {
+  $sql = '(' . implode(" {$separator} ", array_map(function(SqlCond $cond) {
+    return $cond->sql;
+  }, $conds)) . ')';
+  $params = call_user_func_array('array_merge', array_map(function(SqlCond $cond) {
+    return $cond->params;
+  }, $conds));
+}
+
 function generate_insert($db, $table, $fields, $values, $literal_exceptions=array()) {
   $safe_table = $db->escape_string($table);
   $safe_fields = implode(',', array_map(function($field) use(&$db) {
@@ -56,7 +80,7 @@ function generate_insert($db, $table, $fields, $values, $literal_exceptions=arra
   return array($sql, $sqlparams);
 }
 
-function generate_update($db, $table, $fields, $values) {
+function generate_update($db, $table, $fields, $values, SqlCond $where=null) {
   $safe_table = $db->escape_string($table);
   $modified_fields = implode(',', array_map(function($field) use(&$db,&$values) {
     return '`'.$db->escape_string($field).'`=?';
@@ -65,6 +89,10 @@ function generate_update($db, $table, $fields, $values) {
     return isset($values[$field]) ? $values[$field] : null;
   }, $fields);
   $sql = "UPDATE `{$safe_table}` SET {$modified_fields}";
+  if (!is_null($where)) {
+    $sql .= " WHERE " . $where->sql;
+    $sqlparams = array_merge($sqlparams, $where->params);
+  }
   return array($sql,$sqlparams);
 }
 
