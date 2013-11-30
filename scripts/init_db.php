@@ -7,9 +7,15 @@ if (!isset($argv[1])) {
 
 $schemeNo = $argv[1];
 $schemeFile = __DIR__."/sql/schema-{$schemeNo}.sql";
+$dataFile = __DIR__."/sql/data-{$schemeNo}.sql";
 
 if (!file_exists($schemeFile)) {
   echo "$schemeNo is not a valid schema number.\n";
+  exit(0);
+}
+
+if (!file_exists($dataFile)) {
+  echo "$schemeNo is not a valid data number.\n";
   exit(0);
 }
 
@@ -39,6 +45,13 @@ echo "Executing $cmd...\n";
 passthru($cmd, $exit);
 
 echo "Command exited with code $exit.\n";
+
+$cmd = "mysql -h " . escapeshellarg($host) . " -u" . escapeshellarg($user) . " -p" . escapeshellarg($pwd) . " " . escapeshellarg($db) . " < " . escapeshellarg($dataFile);
+echo "Executing $cmd...\n";
+
+passthru($cmd, $exit);
+echo "Command exited with code $exit.\n";
+
 exit($exit);
 
 ?>
