@@ -23,7 +23,7 @@ function sems_login() {
     if ($redirect) return $redirect;
     else $smarty_vars['login_failed'] = true;
   }
-  return ok(sems_smarty_fetch('login.tpl', $smarty_vars));
+  return ok(sems_smarty_fetch('user/login.tpl', $smarty_vars));
 }
 
 function sems_logout_url() { return SEMS_ROOT.'/logout'; }
@@ -69,7 +69,7 @@ function sems_signup() {
     }
     $smarty_vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $smarty_vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
-    return ok(sems_smarty_fetch('signup.tpl', $smarty_vars));
+    return ok(sems_smarty_fetch('user/signup.tpl', $smarty_vars));
   });
 }
 
@@ -89,7 +89,7 @@ function sems_confirm() {
       //Re-set identity whenever something in the user changes
       sems_set_identity(sems_create_identity($db, $ident->UserId));
     }
-    return ok(sems_smarty_fetch("confirm.tpl", $vars));
+    return ok(sems_smarty_fetch("user/confirm.tpl", $vars));
   });
 }
 
@@ -109,6 +109,15 @@ class Identity {
     $this->UserId = $user_id;
     $this->Roles = $roles;
     $this->UserData = $data;
+  }
+  public function fullname() {
+    if (!is_array($this->UserData)) return "";
+    $fn = "";
+    if (isset($this->UserData['title'])) $fn .= ucfirst($this->UserData['title']) . ". ";
+    if (!empty($this->UserData['first_name'])) $fn .= $this->UserData['first_name'] . ' ';
+    if (!empty($this->UserData['middle_name'])) $fn .= $this->UserData['middle_name'] . ' ';
+    if (!empty($this->UserData['last_name'])) $fn .= $this->UserData['last_name'];
+    return $fn;
   }
 }
 

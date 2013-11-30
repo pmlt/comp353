@@ -5,7 +5,11 @@
 <table>
   <tr>
     <td>Title:</td>
-    <td><input type="text" name="title" value="{$smarty.post.title}" /></td>
+    <td>{html_options name='title' options=[
+      "mr" => "Mr.",
+      "mrs" => "Mrs.",
+      "ms" => "Ms.",
+      "dr" => "Dr."] selected=$smarty.post.title}</td>
     <td class="error">{$errors.title}</td>
   </tr>
   <tr>
