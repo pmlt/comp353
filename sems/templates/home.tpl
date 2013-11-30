@@ -9,4 +9,15 @@ window.open("{sems_confirm_url()}", "", "width=300,height=200,menubar=0,status=0
 </script>
 {/if}
 
+<p>Select one of the conferences/journals below to access its homepage.</p>
+<table>
+{foreach $conferences as $c}
+<tr>
+  <td><a href="{sems_conference_url($c.conference_id)}">{$c.name}</a></td><td>{$c.description}</td>
+</tr>
+{foreachelse}
+<tr><td>There appears to be no conferences available yet. Come back later!</td></tr>
+{/foreach}
+</table>
+
 {/block}

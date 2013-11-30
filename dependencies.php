@@ -10,3 +10,4 @@ include 'sems/routes.php';
 include 'sems/db.php';
 include 'sems/validation.php';
 include 'sems/templates.php';
+include 'sems/utils.php';

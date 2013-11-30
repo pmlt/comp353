@@ -1,6 +1,7 @@
 <?php
 
 $config = array(
+  //'date' => '2014-01-11 12:00:00',
   'db' => array(
     'host' => 'localhost',
     'db'   => 'comp353',

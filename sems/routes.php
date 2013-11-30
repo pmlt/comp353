@@ -2,6 +2,7 @@
 
 include 'actions/user.php';
 include 'actions/conference.php';
+include 'actions/event.php';
 
 define('SEMS_ROOT', '/comp353');
 $HTTP_ROOT = '/comp353';
@@ -48,9 +49,11 @@ function sems_root() { global $HTTP_ROOT; return $HTTP_ROOT; }
 
 function sems_home_url() { return sems_root()."/"; }
 function sems_home() {
-  return sems_smarty(function($smarty) {
-    $body = $smarty->fetch('home.tpl');
-    return ok($body);
+  return sems_db(function($db) {
+    // Fetch list of conferences for easy selection.
+    $vars = array();
+    $vars['conferences'] = stable($db, "SELECT conference_id, name, description FROM Conference ORDER BY name");
+    return ok(sems_smarty_fetch('home.tpl', $vars));
   });
 }
 
