@@ -59,6 +59,7 @@ function sems_signup() {
         $_POST['date_created'] = 'NOW()'; //This will be interpreted literally
         list($sql, $sqlparams) = generate_insert($db, "User", array('date_created','title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode','email','password'), $_POST, array('date_created'));
         $user_id = insert($db, $sql, $sqlparams);
+        sems_save_identity_topics($db, $user_id, $_POST);
         sems_set_identity(sems_create_identity($db, $user_id));
         return found(sems_home_url());
       }
@@ -69,6 +70,7 @@ function sems_signup() {
     }
     $smarty_vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $smarty_vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
+    $smarty_vars['topic_hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
     return ok(sems_smarty_fetch('user/signup.tpl', $smarty_vars));
   });
 }
@@ -142,6 +144,9 @@ function sems_profile_edit($uid) {
         //Edit user data then return to profile
         list($sql, $sqlparams) = generate_update($db, "User", array('title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode'), $_POST, qeq('user_id', $ident->UserId));
         $rows_affected = affect($db, $sql, $sqlparams);
+
+        //Now handle any change in topic selection
+        sems_save_identity_topics($db, $ident->UserId, $_POST);
         sems_set_identity(sems_create_identity($db, $ident->UserId));
         return found(sems_profile_url($ident->UserId));
       }
@@ -152,6 +157,7 @@ function sems_profile_edit($uid) {
     }
     $vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
+    $vars['topic_hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
     return ok(sems_smarty_fetch("user/profile_edit.tpl", $vars));
   });
 }
@@ -177,6 +183,13 @@ class Identity {
     if (!empty($this->UserData['middle_name'])) $fn .= $this->UserData['middle_name'] . ' ';
     if (!empty($this->UserData['last_name'])) $fn .= $this->UserData['last_name'];
     return $fn;
+  }
+  public function hastopic($topic_id) {
+    if (!is_array($this->Topics)) return false;
+    foreach ($this->Topics as $t) {
+      if ($t['topic_id'] == $topic_id) return true;
+    }
+    return false;
   }
 }
 
@@ -208,4 +221,14 @@ function sems_identity_data($field) {
 
 function sems_hash_password($pwd) {
   return sha1($pwd);
+}
+
+function sems_save_identity_topics($db, $user_id, $post) {
+  affect($db, "DELETE FROM UserTopic WHERE user_id=?", array($user_id));
+  foreach ($post as $postname => $value) {
+    if (0 === strpos($postname, 'topic_') && $value > 0) {
+      list($sql,$params) = generate_insert($db, 'UserTopic', array('topic_id','user_id'), array('topic_id' => $value, 'user_id' => $user_id));
+      insert($db, $sql, $params);
+    }
+  }
 }

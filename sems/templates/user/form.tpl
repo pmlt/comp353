@@ -60,6 +60,10 @@
     <td><input type="text" name="postcode" value="{$user.postcode}" /></td>
     <td class="error">{$errors.postcode}</td>
   </tr>
+  <tr>
+    <td>Topics of interest: </td>
+    <td>{include file="ui/topic_selector.tpl" hierarchy=$topic_hierarchy}</td>
+  </tr>
   {if !$edit}
   <tr>
     <td>Email:</td>
