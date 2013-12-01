@@ -108,7 +108,7 @@ function sems_conference_edit($cid) {
   });
 }
 
-function get_conference($db, $cid) {
+function get_conference(mysqli $db, $cid) {
   return srow($db, "SELECT * FROM Conference WHERE conference_id=?", array($cid));
 }
 

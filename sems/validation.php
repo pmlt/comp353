@@ -87,3 +87,16 @@ function unique_conference_name($value) {
     return "0" === sone($db, "SELECT COUNT(1) FROM Conference WHERE name=? AND conference_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])));
   });
 }
+
+function unique_event_title_err($fieldname, $value) { return "An event with this name already exists."; }
+function unique_event_title($value) {
+  return sems_acquire_db(function($db) use(&$value) {
+    return "0" === sone($db, "SELECT COUNT(1) FROM Event WHERE title=? AND event_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])));
+  });
+}
+
+function valid_date_err($fieldname, $value) { return "{$value} is not a valid date."; }
+function valid_date($value) {
+  return preg_match('/^\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value) ||
+         preg_match('/^\d\d\d\d-\d\d-\d\d$/', $value);
+}

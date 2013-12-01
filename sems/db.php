@@ -30,7 +30,7 @@ function sems_acquire_db($f) {
   return call_user_func($f, $SEMS_DB_HANDLE);
 }
 
-function sems_throw_db($db, $prefix) {
+function sems_throw_db(mysqli $db, $prefix) {
   throw new Exception($prefix.": (" . $db->errno . ") " . $db->error);
 }
 
@@ -58,7 +58,7 @@ function qgroup($separator, array $conds) {
   }, $conds));
 }
 
-function generate_insert($db, $table, $fields, $values, $literal_exceptions=array()) {
+function generate_insert(mysqli $db, $table, $fields, $values, $literal_exceptions=array()) {
   $safe_table = $db->escape_string($table);
   $safe_fields = implode(',', array_map(function($field) use(&$db) {
     return '`'.$db->escape_string($field).'`';
@@ -80,7 +80,7 @@ function generate_insert($db, $table, $fields, $values, $literal_exceptions=arra
   return array($sql, $sqlparams);
 }
 
-function generate_update($db, $table, $fields, $values, SqlCond $where=null) {
+function generate_update(mysqli $db, $table, $fields, $values, SqlCond $where=null) {
   $safe_table = $db->escape_string($table);
   $modified_fields = implode(',', array_map(function($field) use(&$db,&$values) {
     return '`'.$db->escape_string($field).'`=?';
@@ -96,34 +96,34 @@ function generate_update($db, $table, $fields, $values, SqlCond $where=null) {
   return array($sql,$sqlparams);
 }
 
-function insert($db, $sql, $sqlparams) {
+function insert(mysqli $db, $sql, $sqlparams) {
   return query(function($res) use(&$db) {
     return $db->insert_id;
   }, $db, $sql, $sqlparams);
 }
 
-function affect($db, $sql, $sqlparams) {
+function affect(mysqli $db, $sql, $sqlparams) {
   return query(function($res) use(&$db) {
     return $db->affected_rows;
   }, $db, $sql, $sqlparams);
 }
 
 // Return the resultset as an array of rows.
-function stable($db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
+function stable(mysqli $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
   return smap(function($row) {
     return $row;
   }, $db, $sql, $params, $mode);
 }
 
 // Return the values of the first column of the resultset.
-function scol($db, $sql, array $params=array()) {
+function scol(mysqli $db, $sql, array $params=array()) {
   return smap(function($row) {
     return $row[0];
   }, $db, $sql, $params, MYSQLI_NUM);
 }
 
 // Return the first row of the resultset.
-function srow($db, $sql, array $params=array()) {
+function srow(mysqli $db, $sql, array $params=array()) {
   return query(function($res) {
     $firstrow = $res->fetch_array(MYSQLI_ASSOC);
     if ($firstrow) return $firstrow;
@@ -132,7 +132,7 @@ function srow($db, $sql, array $params=array()) {
 }
 
 // Return the value of the first column of the first row of the resultset.
-function sone($db, $sql, array $params=array()) {
+function sone(mysqli $db, $sql, array $params=array()) {
   return query(function($res) {
     $firstrow = $res->fetch_array(MYSQLI_NUM);
     if ($firstrow) return $firstrow[0];
@@ -141,7 +141,7 @@ function sone($db, $sql, array $params=array()) {
 }
 
 // Return an associative array where the keys are taken from the first column and the values are taken from the second column.
-function sassoc($db, $sql, array $params=array())  {
+function sassoc(mysqli $db, $sql, array $params=array())  {
   return sreduce(function($assoc, $row) use(&$assoc) {
     $assoc[$row[0]] = $row[1];
     return $assoc;
@@ -149,12 +149,12 @@ function sassoc($db, $sql, array $params=array())  {
 }
 
 // Just get the number of rows returned by a query
-function scount($db, $sql, array $params=array()) {
+function scount(mysqli $db, $sql, array $params=array()) {
   return query(function($res){ return $res->num_rows; }, $db, $sql, $params);
 }
 
 // Map callback to every result row
-function smap($f, $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
+function smap($f, mysqli $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
   return query(function($res) use (&$f, $mode) {
     $mapped = array();
     while($row = $res->fetch_array($mode)) {
@@ -165,7 +165,7 @@ function smap($f, $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
 }
 
 // Reduce resultset to a single result using callback
-function sreduce($f, $init, $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
+function sreduce($f, $init, mysqli $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC) {
   return query(function($res) use (&$f, &$init, $mode) {
     $reduced = $init;
     while($row = $res->fetch_array($mode)) {
@@ -176,7 +176,7 @@ function sreduce($f, $init, $db, $sql, array $params=array(), $mode=MYSQLI_ASSOC
 }
 
 // Execute query, ensuring cleanup
-function query($f, $db, $sql, array $params=array()) {
+function query($f, mysqli $db, $sql, array $params=array()) {
   $sql = prepare($db, $sql, $params);
   $res = $db->query($sql);
   if ($res === FALSE) {
@@ -193,7 +193,7 @@ function query($f, $db, $sql, array $params=array()) {
   return $result;
 }
 
-function prepare($db, $sql, array $sqlparams=array()) {
+function prepare(mysqli $db, $sql, array $sqlparams=array()) {
   static $PrepareCache = array();
   if(isset($PrepareCache[$sql])) {
     $positions = $PrepareCache[$sql];
@@ -213,7 +213,7 @@ function prepare($db, $sql, array $sqlparams=array()) {
   return $sql;
 }
 
-function sems_quote($dbh, $value)
+function sems_quote(mysqli $dbh, $value)
 {
   $type = gettype($value);
   switch ($type) {
@@ -234,7 +234,7 @@ function sems_quote($dbh, $value)
   }
 }
 
-function sems_escape($dbh, $value)
+function sems_escape(mysqli $dbh, $value)
 {
   if (empty($value)) return "";
   $res = $dbh->real_escape_string($value);

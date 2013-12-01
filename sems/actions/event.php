@@ -6,18 +6,162 @@ function sems_event($cid, $eid) {
     $event = get_event($db, $cid, $eid);
     if (!$event) return sems_notfound();
 
+    $conf = get_conference($db, $cid);
+    if (!$conf) return sems_notfound();
+
     $vars = array();
+    $vars['conf'] = $conf;
     $vars['event'] = $event;
     
     //Get the event chair
     $chair = sems_create_identity($db, $event['chair_id']);
     $vars['chair'] = $chair;
 
+    //Get the list of topics for this event
+    $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "EventTopic", "event_id", $eid));
+
     return ok(sems_smarty_fetch('event/index.tpl', $vars));
   });
 }
 
-function get_event($db, $cid, $eid) {
+
+function sems_event_create_url($cid) { return sems_conference_url($cid)."/create"; }
+function sems_event_create($cid) {
+  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
+    return sems_forbidden();
+  }
+  return sems_db(function($db) use($cid) {
+    $conf = get_conference($db, $cid);
+    if (!$conf) return sems_notfound();
+
+    $vars = array();
+    $vars['conf'] = $conf;
+    if (count($_POST) > 0) {
+      $rules = array(
+        'title' => array('required', 'unique_event_title'),
+        'description' => array('required'),
+        'term_start_date' => array('required', 'valid_date'),
+        'term_end_date' => array('required', 'valid_date'),
+        'submit_start_date' => array('required', 'valid_date'),
+        'submit_end_date' => array('required', 'valid_date'),
+        'auction_start_date' => array('required', 'valid_date'),
+        'auction_end_date' => array('required', 'valid_date'),
+        'review_start_date' => array('required', 'valid_date'),
+        'review_end_date' => array('required', 'valid_date'),
+        'decision_date' => array('required', 'valid_date'),
+        'start_date' => array('required', 'valid_date'),
+        'end_date' => array('required', 'valid_date'),
+        'chair_email' => array('required', 'valid_email', 'valid_user_email')); // XXX
+      $success = sems_validate($_POST, $rules, $errors);
+      var_dump($success);
+      var_dump($errors);
+      if ($success) {
+        $_POST['conference_id'] = $cid;
+        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
+        list($sql, $params) = generate_insert($db, 'Event', array(
+          'conference_id',
+          'title',
+          'description',
+          'term_start_date',
+          'term_end_date',
+          'submit_start_date',
+          'submit_end_date',
+          'auction_start_date',
+          'auction_end_date',
+          'review_start_date',
+          'review_end_date',
+          'decision_date',
+          'start_date',
+          'end_date',
+          'chair_id'), $_POST);
+        $event_id = insert($db, $sql, $params);
+        if ($event_id > 0) {
+          sems_save_topics($db, 'EventTopic', 'event_id', $event_id, $_POST);
+        }
+        return found(sems_event_url($cid, $event_id));
+      }
+      else {
+        $vars['errors'] = $errors;
+      }
+    }
+    $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    return ok(sems_smarty_fetch('event/create.tpl', $vars));
+  });
+}
+
+function sems_event_edit_url($cid, $eid) { return sems_event_url($cid, $eid)."/edit"; }
+function sems_event_edit($cid, $eid) {
+  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
+    return sems_forbidden();
+  }
+  return sems_db(function($db) use($cid, $eid) {
+    $event = get_event($db, $cid, $eid);
+    if (!$event) return sems_notfound();
+
+    $chair = sems_create_identity($db, $event['chair_id']);
+    $conf['chair_email'] = $chair->UserData['email'];
+
+    $vars = array();
+    $vars['event'] = $event;
+    $vars['conf'] = get_conference($db, $cid);
+    $vars['chair'] = $chair;
+
+    if (count($_POST) > 0) {
+      $GLOBALS['UNIQUE_ID_EXCEPTION'] = $eid;
+      $rules = array(
+        'title' => array('required', 'unique_event_title'),
+        'description' => array('required'),
+        'term_start_date' => array('required', 'valid_date'),
+        'term_end_date' => array('required', 'valid_date'),
+        'submit_start_date' => array('required', 'valid_date'),
+        'submit_end_date' => array('required', 'valid_date'),
+        'auction_start_date' => array('required', 'valid_date'),
+        'auction_end_date' => array('required', 'valid_date'),
+        'review_start_date' => array('required', 'valid_date'),
+        'review_end_date' => array('required', 'valid_date'),
+        'decision_date' => array('required', 'valid_date'),
+        'start_date' => array('required', 'valid_date'),
+        'end_date' => array('required', 'valid_date'),
+        'chair_email' => array('required', 'valid_email', 'valid_user_email')); // XXX
+      $success = sems_validate($_POST, $rules, $errors);
+      if ($success) {
+        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
+        list($sql, $params) = generate_update($db, 'Event', array(
+          'title',
+          'description',
+          'term_start_date',
+          'term_end_date',
+          'submit_start_date',
+          'submit_end_date',
+          'auction_start_date',
+          'auction_end_date',
+          'review_start_date',
+          'review_end_date',
+          'decision_date',
+          'start_date',
+          'end_date',
+          'chair_id'), $_POST, qeq('event_id', $eid));
+        $rows_affected = affect($db, $sql, $params);
+        sems_save_topics($db, 'EventTopic', 'event_id', $eid, $_POST);
+        return found(sems_event_url($cid, $eid));
+      }
+      else {
+        $vars['errors'] = $errors;
+      }
+    }
+    $vars['hierarchy'] = sems_topic_hierarchy(sems_select_topics(sems_fetch_topics($db), sems_fetch_topic_selection($db, 'EventTopic', 'event_id', $eid)));
+    return ok(sems_smarty_fetch('event/edit.tpl', $vars));
+  });
+}
+
+function sems_event_committee_url($cid, $eic) { return sems_event_url($cid, $eid)."/committee"; }
+function sems_event_committee($cid, $eid) {
+  // XXX
+}
+
+
+
+function get_event(mysqli $db, $cid, $eid) {
   return srow($db, "SELECT * FROM Event WHERE conference_id=? AND event_id=?", array($cid,$eid));
 }
 

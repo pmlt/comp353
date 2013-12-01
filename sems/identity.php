@@ -61,6 +61,7 @@ function sems_identity_actions(Identity $identity, $actions) {
 }
 
 function sems_identity_permission(Identity $identity, array $permission) {
+  if (in_array('admin', $identity->Roles)) return true; // Admin has EVERYTHING
   list($type,$object) = $permission;
   switch($type) {
     case 'role': return in_array($object, $identity->Roles);

@@ -25,13 +25,22 @@ function sems_routes() {
     "|^{$HTTP_ROOT}/(\w+)/edit$|" => 'sems_conference_edit',
     
     //Event routes
+    "|^{$HTTP_ROOT}/(\w+)/create$|" => 'sems_event_create',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)$|" => 'sems_event',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/search$|" => 'sems_event_search',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/committee$|" => 'sems_event_committee',
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers$|" => 'sems_event_papers',
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/(\w+)$|" => 'sems_event_paper',
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews$|" => 'sems_event_reviews',
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/review/(\w+)$|" => 'sems_event_review',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/edit$|" => 'sems_event_edit',
+
+    //Paper routes
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers$|" => 'sems_papers',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/submit$|" => 'sems_papers_submit',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/(\w+)$|" => 'sems_paper',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews$|" => 'sems_reviews',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/review/(\w+)$|" => 'sems_review',
+
+    //Message routes
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/messages$|" => 'sems_messages',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/message/(\w+)$|" => 'sems_message',
     
     //Home route
     "|^{$HTTP_ROOT}/$|"    => 'sems_home',

@@ -1,9 +1,12 @@
 {extends file="sems_master.tpl"}
 
+{block name='title'}{$conf.name}{/block}
 {block name='content'}
 <h2>{$event.title}</h2>
 
 <p>{$event.description}</p>
+
+<p>Topics of interest are: {include file="ui/topic_hierarchy.tpl"}</p>
 
 <p>Program chair: {$chair->fullname()}</p>
 
