@@ -70,7 +70,7 @@ function sems_signup() {
     }
     $smarty_vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $smarty_vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
-    $smarty_vars['topic_hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    $smarty_vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
     return ok(sems_smarty_fetch('user/signup.tpl', $smarty_vars));
   });
 }
@@ -107,6 +107,8 @@ function sems_profile($uid) {
     // Load all data
     $ident = sems_create_identity($db, $user_id);
     $vars['ident'] = $ident;
+
+    $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, 'UserTopic', 'user_id', $uid));
 
     // Load additional strings
     $vars['organization'] = sone($db, "SELECT name FROM Organization WHERE organization_id=?", array($ident->UserData['organization_id']));
@@ -157,7 +159,7 @@ function sems_profile_edit($uid) {
     }
     $vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
-    $vars['topic_hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    $vars['hierarchy'] = sems_topic_hierarchy(sems_select_topics(sems_fetch_topics($db), $ident->Topics));
     return ok(sems_smarty_fetch("user/profile_edit.tpl", $vars));
   });
 }

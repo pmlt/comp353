@@ -50,7 +50,7 @@ function sems_clear_identity() {
 function sems_create_identity($db, $user_id) {
   $roles = scol($db, "SELECT role FROM UserRole WHERE user_id=?", array($user_id));
   $data = srow($db, "SELECT date_created,title,first_name,middle_name,last_name,country_id,organization_id,department,address,city,province,postcode,email,email_sent_flag,last_event_id FROM User WHERE user_id=?", array($user_id));
-  $topics = stable($db, "SELECT Topic.topic_id, name, category FROM Topic,UserTopic WHERE Topic.topic_id=UserTopic.topic_id AND user_id=?", array($user_id));
+  $topics = scol($db, "SELECT topic_id FROM UserTopic WHERE user_id=?", array($user_id));
   return new Identity($user_id, $roles, $data, $topics);
 }
 
@@ -80,12 +80,6 @@ function sems_hash_password($pwd) {
 }
 
 function sems_save_identity_topics($db, $user_id, $post) {
-  affect($db, "DELETE FROM UserTopic WHERE user_id=?", array($user_id));
-  foreach ($post as $postname => $value) {
-    if (0 === strpos($postname, 'topic_') && $value > 0) {
-      list($sql,$params) = generate_insert($db, 'UserTopic', array('topic_id','user_id'), array('topic_id' => $value, 'user_id' => $user_id));
-      insert($db, $sql, $params);
-    }
-  }
+  return sems_save_topics($db, 'UserTopic', 'user_id', $user_id, $post);
 }
 

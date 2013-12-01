@@ -23,3 +23,37 @@ function sems_topic_hierarchy(array $topics) {
 function sems_fetch_topics($db) {
   return stable($db, "SELECT * FROM Topic ORDER BY category, name");
 }
+
+function sems_fetch_linked_topics($db, $table, $id_field, $id) {
+  return stable($db, "SELECT Topic.topic_id, name, category FROM Topic,{$table} WHERE Topic.topic_id = {$table}.topic_id AND {$table}.{$id_field}=?", array($id));
+}
+
+function sems_fetch_topic_selection($db, $table, $id_field, $id) {
+  return scol($db, "SELECT topic_id FROM {$table} WHERE {$id_field}=?", array($id));
+}
+
+function sems_save_topics($db, $table, $id_field, $id, $post) {
+  affect($db, "DELETE FROM {$table} WHERE {$id_field}=?", array($id));
+  foreach ($post as $postname => $value) {
+    if (0 === strpos($postname, 'topic_') && $value > 0) {
+      list($sql,$params) = generate_insert($db, $table, array('topic_id',$id_field), array('topic_id' => $value, $id_field => $id));
+      error_log($sql);
+      error_log(print_r($params, 1));
+      insert($db, $sql, $params);
+    }
+  }
+}
+
+function sems_filter_topics($topics, $selected) {
+  return array_filter($topics, function($topic) use(&$selected) {
+    return in_array($topic['topic_id'], $selected);
+  });
+}
+
+function sems_select_topics($topics, $selected) {
+  foreach ($topics as &$topic) {
+    $topic['selected'] = in_array($topic['topic_id'], $selected);
+  }
+  return $topics;
+}
+

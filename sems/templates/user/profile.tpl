@@ -15,7 +15,7 @@
   <tr><td>City</td><td>{$u.city}</td></tr>
   <tr><td>Province/State</td><td>{$u.province}</td></tr>
   <tr><td>Post code</td><td>{$u.postcode}</td></tr>
-  <tr><td>Topics of interest</td><td>{include file="ui/topic_hierarchy.tpl" hierarchy=sems_topic_hierarchy($ident->Topics)}</td></tr>
+  <tr><td>Topics of interest</td><td>{include file="ui/topic_hierarchy.tpl"}</td></tr>
 </table>
 
 {$visitor = sems_get_identity()}

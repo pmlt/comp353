@@ -22,6 +22,11 @@
     <td><input id="chair_email" type="text" name="chair_email" value="{$data.chair_email}" /></td>
     <td class="error">{$errors.chair_email}</td>
   </tr>
+  <tr>
+    <td>Topics</td>
+    <td>{include file="ui/topic_selector.tpl"}</td>
+    <td class="error">{$errors.topics}</td>
+  </tr>
   <tr><td colspan="3"><input type="submit" value="Submit" /></td></tr>
 </table>
 </form>

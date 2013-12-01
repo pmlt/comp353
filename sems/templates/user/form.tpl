@@ -62,7 +62,7 @@
   </tr>
   <tr>
     <td>Topics of interest: </td>
-    <td>{include file="ui/topic_selector.tpl" hierarchy=$topic_hierarchy}</td>
+    <td>{include file="ui/topic_selector.tpl"}</td>
   </tr>
   {if !$edit}
   <tr>

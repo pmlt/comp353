@@ -5,7 +5,9 @@
 
 <p>{$conf.description}</p>
 
-<p>Conference chair: {$chair->fullname()}</p>
+<p>Topics of interest are: {include file="ui/topic_hierarchy.tpl"}</p>
+
+<p>Conference chair: <a href="{sems_profile_url($chair->UserId)}">{$chair->fullname()}</a></p>
 
 <p>Scheduled events in this conference:</p>
 
