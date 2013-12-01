@@ -8,15 +8,8 @@ define('SEMS_ROOT', '/comp353');
 $HTTP_ROOT = '/comp353';
 
 function sems_routes() {
-  //XXX must define routes here.
   global $HTTP_ROOT;
   return array(
-    //SEMS Administration routes
-    "|^{$HTTP_ROOT}/admin$|" => 'sems_admin',
-    "|^{$HTTP_ROOT}/admin/conferences$|" => 'sems_admin_conferences',
-    "|^{$HTTP_ROOT}/admin/conferences/create$|" => 'sems_admin_conferences_create',
-    "|^{$HTTP_ROOT}/admin/conferences/edit$|" => 'sems_admin_conferences_create',
-    
     //User management routes
     "|^{$HTTP_ROOT}/login$|" => 'sems_login',
     "|^{$HTTP_ROOT}/logout$|" => 'sems_logout',
@@ -26,8 +19,10 @@ function sems_routes() {
     "|^{$HTTP_ROOT}/profile/(\d+)/edit$|" => 'sems_profile_edit',
     
     //Conference routes
+    "|^{$HTTP_ROOT}/create$|" => 'sems_conference_create',
     "|^{$HTTP_ROOT}/(\w+)$|" => 'sems_conference',
     "|^{$HTTP_ROOT}/(\w+)/search$|" => 'sems_conference_search',
+    "|^{$HTTP_ROOT}/(\w+)/edit$|" => 'sems_conference_edit',
     
     //Event routes
     "|^{$HTTP_ROOT}/(\w+)/(\w+)$|" => 'sems_event',
@@ -53,6 +48,13 @@ function sems_home() {
     // Fetch list of conferences for easy selection.
     $vars = array();
     $vars['conferences'] = stable($db, "SELECT conference_id, name, description FROM Conference ORDER BY name");
+
+    $actions = array(
+      array(
+        'url' => sems_conference_create_url(),
+        'label' => 'Create a new conference',
+        'permission' => array('role','admin')));
+    $vars['actions'] = sems_identity_actions(sems_get_identity(), $actions);
     return ok(sems_smarty_fetch('home.tpl', $vars));
   });
 }

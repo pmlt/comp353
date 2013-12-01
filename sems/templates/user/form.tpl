@@ -86,6 +86,6 @@
     <td class="error">{$errors.password_confirm}</td>
   </tr>
   {/if}
-  <tr><td colspan="2"><input type="submit" value="Submit" /></td></tr>
+  <tr><td colspan="3"><input type="submit" value="Submit" /></td></tr>
 </table>
 </form>

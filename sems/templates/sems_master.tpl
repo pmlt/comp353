@@ -5,6 +5,7 @@
 {/block}
 
 {block name='body'}
+<h1>{block name='title'}SEMS - Scholarly Event Management System{/block}</h1>
 {include file='ui/header.tpl'}
 <div id="content">
 {block name='content'}{/block}

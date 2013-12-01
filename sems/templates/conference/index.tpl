@@ -1,7 +1,7 @@
 {extends file="sems_master.tpl"}
 
+{block name='title'}{$conf.name}{/block}
 {block name='content'}
-<h2>{$conf.name}</h2>
 
 <p>{$conf.description}</p>
 

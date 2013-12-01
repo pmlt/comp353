@@ -12,6 +12,15 @@ function sems_conference($cid) {
     //Get the program chair
     $chair = sems_create_identity($db, $conf['chair_id']);
     $vars['chair'] = $chair;
+    
+    //Possible actions
+    $actions = array(
+      array(
+        'url' => sems_conference_edit_url($cid),
+        'label' => 'Modify this conference',
+        'permission' => array('role', 'admin')));
+
+    $vars['actions'] = sems_identity_actions(sems_get_identity(), $actions);
 
     //Get the list of events for this conference
     $vars['events'] = stable($db, "SELECT event_id, title, description, start_date FROM Event WHERE conference_id=? ORDER BY start_date", array($cid));
@@ -24,6 +33,80 @@ function sems_conference_search($conf) {
   return sems_notfound();
 }
 
+function sems_conference_create_url() { return SEMS_ROOT.'/create'; }
+function sems_conference_create() {
+  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
+    return sems_forbidden();
+  }
+  return sems_db(function($db) {
+    $vars = array();
+    if (count($_POST) > 0) {
+      $rules = array(
+        'name' => array('required', 'unique_conference_name'),
+        'type' => array('required', 'valid_conference_type'),
+        'description' => array('required'),
+        'chair_email' => array('required', 'valid_email', 'valid_user_email'));
+      $success = sems_validate($_POST, $rules, $errors);
+      if ($success) {
+        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
+        list($sql, $params) = generate_insert($db, "Conference", array('name', 'type', 'description', 'chair_id'), $_POST);
+        $conference_id = insert($db, $sql, $params);
+        return found(sems_conference_url($conference_id));
+      }
+      else {
+        $vars['errors'] = $errors;
+      }
+    }
+    return ok(sems_smarty_fetch('conference/create.tpl', $vars));
+  });
+}
+
+function sems_conference_edit_url($cid) { return sems_conference_url($cid) . "/edit"; }
+function sems_conference_edit($cid) {
+  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
+    return sems_forbidden();
+  }
+  return sems_db(function($db) use($cid) {
+    $conf = get_conference($db, $cid);
+    if (!$conf) return sems_notfound();
+
+    //Get the program chair
+    $chair = sems_create_identity($db, $conf['chair_id']);
+    $conf['chair_email'] = $chair->UserData['email'];
+
+    $vars = array();
+    $vars['conf'] = $conf;
+    $vars['chair'] = $chair;
+
+    if (count($_POST) > 0) {
+      $GLOBALS['UNIQUE_ID_EXCEPTION'] = $cid;
+      $rules = array(
+        'name' => array('required', 'unique_conference_name'),
+        'type' => array('required', 'valid_conference_type'),
+        'description' => array('required'),
+        'chair_email' => array('required', 'valid_email', 'valid_user_email'));
+      $success = sems_validate($_POST, $rules, $errors);
+      if ($success) {
+        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
+        list($sql, $params) = generate_update($db, "Conference", array('name', 'type', 'description', 'chair_id'), $_POST, qeq('conference_id', $cid));
+        $rows_affected = affect($db, $sql, $params);
+        return found(sems_conference_url($cid));
+      }
+      else {
+        $vars['errors'] = $errors;
+      }
+    }
+    return ok(sems_smarty_fetch('conference/edit.tpl', $vars));
+  });
+}
+
 function get_conference($db, $cid) {
   return srow($db, "SELECT * FROM Conference WHERE conference_id=?", array($cid));
+}
+
+function conference_actions($cid) {
+  return array(
+    'conference' => array(
+      'edit' => array(
+        'Modify this conference' => sems_conference_edit_url($cid))));
 }

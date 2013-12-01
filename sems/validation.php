@@ -54,6 +54,10 @@ function valid_organization_id($value) {
   });
 }
 
+function valid_conference_type($value) {
+  return $value == 'J' || $value == 'C';
+}
+
 function unique_email_err($fieldname, $value) { return "This email address is already registered."; }
 function unique_email($value) {
   return sems_acquire_db(function($db) use(&$value) {
@@ -66,6 +70,20 @@ function valid_email($value) {
   return filter_var($value, FILTER_VALIDATE_EMAIL);
 }
 
+function valid_user_email_err($fieldname, $value) { return "We could not find this email in our database."; }
+function valid_user_email($value) {
+  return sems_acquire_db(function($db) use(&$value) {
+    return 0 < sone($db, "SELECT user_id FROM User WHERE email=?", array($value));
+  });
+}
+
 function valid_ip($value) {
   return filter_var($value, FILTER_VALIDATE_IP);
+}
+
+function unique_conference_name_err($fieldname, $value) { return "A conference with this name already exists."; }
+function unique_conference_name($value) {
+  return sems_acquire_db(function($db) use(&$value) {
+    return "0" === sone($db, "SELECT COUNT(1) FROM Conference WHERE name=? AND conference_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])));
+  });
 }

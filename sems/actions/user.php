@@ -3,7 +3,7 @@
 function sems_login_url() { return SEMS_ROOT.'/login'; }
 function sems_login() {
   //If already logged-in, redirect to home.
-  if (sems_get_identity() != null) {
+  if (!sems_is_anonymous()) {
     return found(sems_home_url());
   }
   //If information was posted, try to login
@@ -35,7 +35,7 @@ function sems_logout() {
 function sems_signup_url() { return SEMS_ROOT.'/signup'; }
 function sems_signup() {
   //If already logged-in, redirect to home.
-  if (sems_get_identity() != null) {
+  if (!sems_is_anonymous()) {
     return found(sems_home_url());
   }
   return sems_db(function($db) {
@@ -78,10 +78,10 @@ function sems_signup() {
 function sems_confirm_url() { return SEMS_ROOT.'/confirm'; }
 function sems_confirm() {
   //If NOT logged-in, give 404.
-  $ident = sems_get_identity();
-  if ($ident == null) {
+  if (sems_is_anonymous()) {
     return sems_notfound();
   }
+  $ident = sems_get_identity();
   
   return sems_db(function($db) use($ident) {
     $vars = array();
@@ -119,10 +119,10 @@ function sems_profile($uid) {
 function sems_profile_edit_url($uid) { return SEMS_ROOT . "/profile/{$uid}/edit"; }
 function sems_profile_edit($uid) {
   //If NOT logged-in, give 404.
-  $ident = sems_get_identity();
-  if ($ident == null) {
+  if (sems_is_anonymous()) {
     return sems_notfound();
   }
+  $ident = sems_get_identity();
   //If logged-in but trying to edit someone else, give 403
   if ($ident->UserId != $uid) {
     return sems_forbidden();
@@ -162,73 +162,3 @@ function sems_profile_edit($uid) {
   });
 }
 
-/**************** Authentication functions *******************/
-
-class Identity {
-  public $UserId;
-  public $Roles;
-  public $UserData;
-  public $Topics;
-  public function __construct($user_id, array $roles, $data, $topics) {
-    $this->UserId = $user_id;
-    $this->Roles = $roles;
-    $this->UserData = $data;
-    $this->Topics = $topics;
-  }
-  public function fullname() {
-    if (!is_array($this->UserData)) return "";
-    $fn = "";
-    if (isset($this->UserData['title'])) $fn .= ucfirst($this->UserData['title']) . ". ";
-    if (!empty($this->UserData['first_name'])) $fn .= $this->UserData['first_name'] . ' ';
-    if (!empty($this->UserData['middle_name'])) $fn .= $this->UserData['middle_name'] . ' ';
-    if (!empty($this->UserData['last_name'])) $fn .= $this->UserData['last_name'];
-    return $fn;
-  }
-  public function hastopic($topic_id) {
-    if (!is_array($this->Topics)) return false;
-    foreach ($this->Topics as $t) {
-      if ($t['topic_id'] == $topic_id) return true;
-    }
-    return false;
-  }
-}
-
-function sems_get_identity() {
-  if (!isset($_SESSION['sems_identity'])) return null;
-  return $_SESSION['sems_identity'];
-}
-
-function sems_set_identity(Identity $identity) {
-  $_SESSION['sems_identity'] = $identity;
-}
-
-function sems_clear_identity() {
-  unset($_SESSION['sems_identity']);
-}
-
-function sems_create_identity($db, $user_id) {
-  $roles = scol($db, "SELECT role FROM UserRole WHERE user_id=?", array($user_id));
-  $data = srow($db, "SELECT date_created,title,first_name,middle_name,last_name,country_id,organization_id,department,address,city,province,postcode,email,email_sent_flag,last_event_id FROM User WHERE user_id=?", array($user_id));
-  $topics = stable($db, "SELECT Topic.topic_id, name, category FROM Topic,UserTopic WHERE Topic.topic_id=UserTopic.topic_id AND user_id=?", array($user_id));
-  return new Identity($user_id, $roles, $data, $topics);
-}
-
-function sems_identity_data($field) {
-  $ident = sems_get_identity();
-  if ($ident && isset($ident->UserData[$field])) return $ident->UserData[$field];
-  return null;
-}
-
-function sems_hash_password($pwd) {
-  return sha1($pwd);
-}
-
-function sems_save_identity_topics($db, $user_id, $post) {
-  affect($db, "DELETE FROM UserTopic WHERE user_id=?", array($user_id));
-  foreach ($post as $postname => $value) {
-    if (0 === strpos($postname, 'topic_') && $value > 0) {
-      list($sql,$params) = generate_insert($db, 'UserTopic', array('topic_id','user_id'), array('topic_id' => $value, 'user_id' => $user_id));
-      insert($db, $sql, $params);
-    }
-  }
-}
