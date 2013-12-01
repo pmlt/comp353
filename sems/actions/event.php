@@ -156,13 +156,52 @@ function sems_event_edit($cid, $eid) {
 
 function sems_event_committee_url($cid, $eic) { return sems_event_url($cid, $eid)."/committee"; }
 function sems_event_committee($cid, $eid) {
-  // XXX
+  return sems_db(function($db) use($cid,$eid) {
+    $event = get_event($db, $cid, $eid);
+    if (!$event) return sems_notfound();
+
+    if (!sems_identity_permission(sems_get_identity(), array('user_id', $event['chair_id']))) {
+      return sems_forbidden();
+    }
+    $vars = array();
+    $vars['event'] = $event;
+    $vars['conf'] = get_conference($db, $cid);
+
+    if (isset($_POST['committee'])) {
+      $errors = array();
+      $new_members = array_filter(array_map(function($email) use(&$db, &$errors) {
+        if (empty($email)) return null;
+        $user_id = sone($db, "SELECT user_id FROM User WHERE email=?", array($email));
+        if (!$user_id) $errors[] = $email . ' cannot be found in database.';
+        return $user_id;
+      }, explode('|', $_POST['committee'])));
+      if (count($errors) != 0) {
+        $vars['errors'] = $errors;
+      }
+      else {
+        //Save in DB
+        affect($db, "DELETE FROM CommitteeMembership WHERE event_id=?", array($eid));
+        foreach ($new_members as $uid) {
+          insert($db, "INSERT INTO CommitteeMembership (event_id,user_id) VALUES(?,?)", array($eid, $uid));
+        }
+        $vars['success'] = true;
+      }
+    }
+
+    // Fetch committee
+    $vars['committee'] = get_event_committee($db, $eid);
+    return ok(sems_smarty_fetch('event/committee.tpl', $vars));
+  });
 }
 
 
 
 function get_event(mysqli $db, $cid, $eid) {
   return srow($db, "SELECT * FROM Event WHERE conference_id=? AND event_id=?", array($cid,$eid));
+}
+
+function get_event_committee(mysqli $db, $eid) {
+  return stable($db, "SELECT User.user_id, User.email FROM User,CommitteeMembership AS ec WHERE ec.user_id=User.user_id AND ec.event_id=?", array($eid));
 }
 
 $event_states = array(
