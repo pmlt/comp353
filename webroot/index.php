@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL & ~E_NOTICE);
+
 include '../dependencies.php';
 
 //Always start the session, this is a very user-driven site
