@@ -51,13 +51,11 @@ function sems_event_create($cid) {
         'decision_date' => array('required', 'valid_date'),
         'start_date' => array('required', 'valid_date'),
         'end_date' => array('required', 'valid_date'),
-        'chair_email' => array('required', 'valid_email', 'valid_user_email')); // XXX
-      $success = sems_validate($_POST, $rules, $errors);
-      var_dump($success);
-      var_dump($errors);
+        'chair_email' => array('required', 'valid_email', 'email_to_id'));
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
-        $_POST['conference_id'] = $cid;
-        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
+        $data['conference_id'] = $cid;
+        $data['chair_id'] = $data['chair_email'];
         list($sql, $params) = generate_insert($db, 'Event', array(
           'conference_id',
           'title',
@@ -73,7 +71,7 @@ function sems_event_create($cid) {
           'decision_date',
           'start_date',
           'end_date',
-          'chair_id'), $_POST);
+          'chair_id'), $data);
         $event_id = insert($db, $sql, $params);
         if ($event_id > 0) {
           sems_save_topics($db, 'EventTopic', 'event_id', $event_id, $_POST);
@@ -122,10 +120,10 @@ function sems_event_edit($cid, $eid) {
         'decision_date' => array('required', 'valid_date'),
         'start_date' => array('required', 'valid_date'),
         'end_date' => array('required', 'valid_date'),
-        'chair_email' => array('required', 'valid_email', 'valid_user_email')); // XXX
-      $success = sems_validate($_POST, $rules, $errors);
+        'chair_email' => array('required', 'valid_email', 'email_to_id'));
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
-        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
+        $data['chair_id'] = $data['chair_email'];
         list($sql, $params) = generate_update($db, 'Event', array(
           'title',
           'description',
@@ -140,7 +138,7 @@ function sems_event_edit($cid, $eid) {
           'decision_date',
           'start_date',
           'end_date',
-          'chair_id'), $_POST, qeq('event_id', $eid));
+          'chair_id'), $data, qeq('event_id', $eid));
         $rows_affected = affect($db, $sql, $params);
         sems_save_topics($db, 'EventTopic', 'event_id', $eid, $_POST);
         return found(sems_event_url($cid, $eid));
@@ -168,23 +166,15 @@ function sems_event_committee($cid, $eid) {
     $vars['conf'] = get_conference($db, $cid);
 
     if (isset($_POST['committee'])) {
-      $errors = array();
-      $new_members = array_filter(array_map(function($email) use(&$db, &$errors) {
-        if (empty($email)) return null;
-        $user_id = sone($db, "SELECT user_id FROM User WHERE email=?", array($email));
-        if (!$user_id) $errors[] = $email . ' cannot be found in database.';
-        return $user_id;
-      }, explode('|', $_POST['committee'])));
-      if (count($errors) != 0) {
-        $vars['errors'] = $errors;
+      $rules = array('committee' => array('valid_user_references'));
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
+      if ($success) {
+        //Save in DB
+        sems_save_user_selection($db, 'CommitteeMembership', 'event_id', $eid, $data['committee']);
+        $vars['success'] = true;
       }
       else {
-        //Save in DB
-        affect($db, "DELETE FROM CommitteeMembership WHERE event_id=?", array($eid));
-        foreach ($new_members as $uid) {
-          insert($db, "INSERT INTO CommitteeMembership (event_id,user_id) VALUES(?,?)", array($eid, $uid));
-        }
-        $vars['success'] = true;
+        $vars['errors'] = $errors['committee'];
       }
     }
 

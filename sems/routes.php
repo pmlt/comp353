@@ -3,6 +3,8 @@
 include 'actions/user.php';
 include 'actions/conference.php';
 include 'actions/event.php';
+include 'actions/message.php';
+include 'actions/paper.php';
 
 define('SEMS_ROOT', '/comp353');
 $HTTP_ROOT = '/comp353';

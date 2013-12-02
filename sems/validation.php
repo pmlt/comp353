@@ -2,6 +2,7 @@
 
 function sems_validate($post, $rules, &$errors) {
   $errors = array();
+  $data = array();
   foreach ($rules as $fieldname => $rules) {
     if (!isset($post[$fieldname])) {
       if ($rules[0] == 'required') {
@@ -13,90 +14,177 @@ function sems_validate($post, $rules, &$errors) {
     foreach ($rules as $rule) {
       if ($rule == 'match_confirm') {
         //Special rule requires comparing to other field
-        $v = match_confirm($value, $post["{$fieldname}_confirm"]);
+        list($v,$value) = match_confirm($value, $post["{$fieldname}_confirm"]);
       }
       else {
-        $v = call_user_func($rule, $value);
+        if (!is_callable($rule)) throw new Exception("Invalid rule $rule");
+        list($v,$value) = call_user_func($rule, $value);
       }
       if ($v === false) {
-        if (is_callable("{$rule}_err")) {
-          $errors[$fieldname] = call_user_func("{$rule}_err", $fieldname, $value);
-        }
-        else {
-          $errors[$fieldname] = $fieldname . " is invalid.";
-        }
+        $errors[$fieldname] = $value;
         break;
       }
     }
+    $data[$fieldname] = $value;
   }
-  return count($errors) <= 0;
+  return array(count($errors) == 0, $data);
 }
 
-function required_err($fieldname, $value) { return "{$fieldname} is required."; }
 function required($val) {
-  return !is_null($val) && $val != "";
+  if (!is_null($val) && $val != "") {
+    return array(true, $val);
+  } else {
+    return array(false, "This field is required.");
+  }
 }
 
-function match_confirm_err($fieldname, $value) { return $fieldname." does not match."; }
 function match_confirm($val, $against) {
-  return $val === $against;
+  if ($val === $against) {
+    return array(true, $val);
+  }
+  else {
+    return array(false, "This field does not match.");
+  }
 }
 
 function valid_country_id($value) {
   return sems_acquire_db(function($db) use(&$value) {
-    return "1" === sone($db, "SELECT COUNT(1) FROM Country WHERE country_id=?", array($value));
+    if ("1" === sone($db, "SELECT COUNT(1) FROM Country WHERE country_id=?", array($value))) {
+      return array(true, $value);
+    } else {
+      return array(false, "This country ID is invalid.");
+    }
   });
 }
 
 function valid_organization_id($value) {
   return sems_acquire_db(function($db) use(&$value) {
-    return "1" === sone($db, "SELECT COUNT(1) FROM Organization WHERE organization_id=?", array($value));
+    if ("1" === sone($db, "SELECT COUNT(1) FROM Organization WHERE organization_id=?", array($value))) {
+      return array(true, $value);
+    } else {
+      return array(false, "This organization ID is invalid.");
+    }
   });
 }
 
 function valid_conference_type($value) {
-  return $value == 'J' || $value == 'C';
+  if ($value == 'J' || $value == 'C') {
+    return array(true, $value);
+  }
+  else {
+    return array(false, "This is not a valid conference type.");
+  }
 }
 
-function unique_email_err($fieldname, $value) { return "This email address is already registered."; }
 function unique_email($value) {
   return sems_acquire_db(function($db) use(&$value) {
-    return "0" === sone($db, "SELECT COUNT(1) FROM User WHERE email=?", array($value));
+    if ("0" === sone($db, "SELECT COUNT(1) FROM User WHERE email=?", array($value))) {
+      return array(true, $value);
+    }
+    else {
+      return array(false, "This email address is already registered.");
+    }
   });
 }
 
-function valid_email_err($fieldname, $value) { return "Not a valid email address."; }
 function valid_email($value) {
-  return filter_var($value, FILTER_VALIDATE_EMAIL);
+  if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+    return array(true, $value);
+  }
+  else {
+    return array(false, "Not a valid email address.");
+  }
 }
 
-function valid_user_email_err($fieldname, $value) { return "We could not find this email in our database."; }
-function valid_user_email($value) {
+function email_to_id($value) {
   return sems_acquire_db(function($db) use(&$value) {
-    return 0 < sone($db, "SELECT user_id FROM User WHERE email=?", array($value));
+    $uid = sone($db, "SELECT user_id FROM User WHERE email=?", array($value));
+    if ($uid > 0) {
+      return array(true, $uid);
+    }
+    else {
+      return array(false, "We could not find {$value} in our database.");
+    }
   });
 }
 
 function valid_ip($value) {
-  return filter_var($value, FILTER_VALIDATE_IP);
+  if (filter_var($value, FILTER_VALIDATE_IP)) {
+    return array(true, $value);
+  }
+  else {
+    return array(false, "This IP is invalid.");
+  }
 }
 
-function unique_conference_name_err($fieldname, $value) { return "A conference with this name already exists."; }
 function unique_conference_name($value) {
   return sems_acquire_db(function($db) use(&$value) {
-    return "0" === sone($db, "SELECT COUNT(1) FROM Conference WHERE name=? AND conference_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])));
+    if ("0" === sone($db, "SELECT COUNT(1) FROM Conference WHERE name=? AND conference_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])))) {
+      return array(true, $value);
+    }
+    else {
+      return array(false, "A conference with this name already exists.");
+    }
   });
 }
 
-function unique_event_title_err($fieldname, $value) { return "An event with this name already exists."; }
 function unique_event_title($value) {
   return sems_acquire_db(function($db) use(&$value) {
-    return "0" === sone($db, "SELECT COUNT(1) FROM Event WHERE title=? AND event_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])));
+    if("0" === sone($db, "SELECT COUNT(1) FROM Event WHERE title=? AND event_id != ?", array($value, intval($GLOBALS['UNIQUE_ID_EXCEPTION'])))) {
+      return array(true, $value);
+    }
+    else {
+      return array(false, "An event with this title already exists.");
+    }
   });
 }
 
-function valid_date_err($fieldname, $value) { return "{$value} is not a valid date."; }
 function valid_date($value) {
-  return preg_match('/^\d\d\d\d-\d\d-\d\d\s\d\d:\d\d:\d\d$/', $value) ||
-         preg_match('/^\d\d\d\d-\d\d-\d\d$/', $value);
+  $time = strtotime($value);
+  if ($time === FALSE) {
+    return array(false, "{$value} is not a valid date and time.");
+  }
+  else {
+    return array(true, date('Y-m-d H:i:s', $time));
+  }
+}
+
+function valid_user_references($value) {
+  $uids = array();
+  $errors = array();
+  foreach (explode('|', $value) as $email) {
+    if (empty($email)) continue;
+    list($v, $e) = email_to_id($email);
+    if ($v) $uids[] = $e;
+    else $errors[$email] = $e;
+  }
+  if (count($errors) > 0) {
+    return array(false, $errors);
+  }
+  else {
+    return array(true, $uids);
+  }
+}
+
+function valid_upload($value) {
+  $upload_ok = isset($_FILES['file']) &&
+               $_FILES['file']['error'] == UPLOAD_ERR_OK &&
+               is_uploaded_file($_FILES['file']['tmp_name']);
+  if ($upload_ok) {
+    return array(true, $value);
+  }
+  else {
+    return array(false, "File upload failed");
+  }
+}
+
+function valid_pdf($value) {
+  var_dump($_FILES);
+  $file = exec('file ' . escapeshellarg($_FILES['file']['tmp_name']));
+  if (FALSE !== strpos('PDF document', $file)) {
+    return array(true, $value);
+  }
+  else {
+    return array(false, "File is not a PDF: {$file}");
+  }
 }

@@ -51,13 +51,13 @@ function sems_signup() {
         'department' => array('required'),
         'email' => array('required','valid_email','match_confirm','unique_email'),
         'password' => array('required','match_confirm'));
-      $success = sems_validate($_POST, $rules, $errors);
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
         //Create user.
         //Hash password
-        $_POST['password'] = sems_hash_password($_POST['password']);
-        $_POST['date_created'] = 'NOW()'; //This will be interpreted literally
-        list($sql, $sqlparams) = generate_insert($db, "User", array('date_created','title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode','email','password'), $_POST, array('date_created'));
+        $data['password'] = sems_hash_password($_POST['password']);
+        $data['date_created'] = 'NOW()'; //This will be interpreted literally
+        list($sql, $sqlparams) = generate_insert($db, "User", array('date_created','title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode','email','password'), $data, array('date_created'));
         $user_id = insert($db, $sql, $sqlparams);
         sems_save_identity_topics($db, $user_id, $_POST);
         sems_set_identity(sems_create_identity($db, $user_id));
@@ -141,10 +141,10 @@ function sems_profile_edit($uid) {
         'country_id' => array('required','valid_country_id'),
         'organization_id' => array('required','valid_organization_id'),
         'department' => array('required'));
-      $success = sems_validate($_POST, $rules, $errors);
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
         //Edit user data then return to profile
-        list($sql, $sqlparams) = generate_update($db, "User", array('title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode'), $_POST, qeq('user_id', $ident->UserId));
+        list($sql, $sqlparams) = generate_update($db, "User", array('title','first_name','middle_name','last_name','country_id','organization_id','department','address','city','province','postcode'), $data, qeq('user_id', $ident->UserId));
         $rows_affected = affect($db, $sql, $sqlparams);
 
         //Now handle any change in topic selection

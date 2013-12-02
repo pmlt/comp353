@@ -47,11 +47,11 @@ function sems_conference_create() {
         'name' => array('required', 'unique_conference_name'),
         'type' => array('required', 'valid_conference_type'),
         'description' => array('required'),
-        'chair_email' => array('required', 'valid_email', 'valid_user_email'));
-      $success = sems_validate($_POST, $rules, $errors);
+        'chair_email' => array('required', 'valid_email', 'email_to_id'));
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
-        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
-        list($sql, $params) = generate_insert($db, "Conference", array('name', 'type', 'description', 'chair_id'), $_POST);
+        $data['chair_id'] = $data['chair_email'];
+        list($sql, $params) = generate_insert($db, "Conference", array('name', 'type', 'description', 'chair_id'), $data);
         $conference_id = insert($db, $sql, $params);
         if ($conference_id > 0) {
           sems_save_topics($db, 'ConferenceTopic', 'conference_id', $conference_id, $_POST);
@@ -90,11 +90,11 @@ function sems_conference_edit($cid) {
         'name' => array('required', 'unique_conference_name'),
         'type' => array('required', 'valid_conference_type'),
         'description' => array('required'),
-        'chair_email' => array('required', 'valid_email', 'valid_user_email'));
-      $success = sems_validate($_POST, $rules, $errors);
+        'chair_email' => array('required', 'valid_email', 'email_to_id'));
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
-        $_POST['chair_id'] = sone($db, "SELECT user_id FROM User WHERE email=?", array($_POST['chair_email']));
-        list($sql, $params) = generate_update($db, "Conference", array('name', 'type', 'description', 'chair_id'), $_POST, qeq('conference_id', $cid));
+        $data['chair_id'] = $data['chair_email'];
+        list($sql, $params) = generate_update($db, "Conference", array('name', 'type', 'description', 'chair_id'), $data, qeq('conference_id', $cid));
         $rows_affected = affect($db, $sql, $params);
         sems_save_topics($db, 'ConferenceTopic', 'conference_id', $cid, $_POST);
         return found(sems_conference_url($cid));
