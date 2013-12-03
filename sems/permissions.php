@@ -79,10 +79,11 @@ function can_assign_paper_reviews($event, Identity $identity=null) {
   return $event['chair_id'] == $identity->UserId;
 }
 
-function can_review_paper($event, $paper, Identity $identity=null) {
+function can_review_paper($event, $review, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   if ('review' != sems_event_state($event)) return false; // Can only review in the right period
-  return $paper['reviewer_id'] == $identity->UserId;
+  if ($identity->UserId <= 0) return false;
+  return $review['reviewer_id'] == $identity->UserId || $review['external_reviewer_id'] == $identity->UserId;
 }
 
 function can_accept_papers($event, Identity $identity=null) {

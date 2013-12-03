@@ -4,7 +4,7 @@ function sems_validate($post, $rules, &$errors) {
   $errors = array();
   $data = array();
   foreach ($rules as $fieldname => $rules) {
-    if (!isset($post[$fieldname])) {
+    if (empty($post[$fieldname])) {
       if ($rules[0] == 'required') {
         $errors[$fieldname] = $fieldname.' is required.';
       }
@@ -191,3 +191,22 @@ function valid_pdf($value) {
 function valid_boolean($value) {
   return array(true, $value == TRUE);
 }
+
+function valid_scale($value) {
+  if ($value > 0 && $value <= 10) {
+    return array(true, (int)$value);
+  }
+  else {
+    return array(false, "Must be an integer from 1 to 10.");
+  }
+}
+
+function valid_originality($value) {
+  if (in_array($value, array('good','bad','mediocre'))) {
+    return array(true, $value);
+  }
+  else {
+    return array(false, "Must be either 'good','bad','mediocre'");
+  }
+}
+

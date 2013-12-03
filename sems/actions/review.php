@@ -7,7 +7,60 @@ function sems_reviews($cid, $eid) {
 
 function sems_review_url($cid, $eid, $rid) { return sems_reviews_url($cid, $eid)."/{$rid}"; }
 function sems_review($cid, $eid, $rid) {
-  // XXX
+  return sems_db(function($db) use($cid, $eid, $rid) {
+    $conf = get_conference($db, $cid);
+    $event = get_event($db, $cid, $eid);
+    $review = get_review($db, $rid);
+    if (!$conf || !$event || !$review) return sems_notfound();
+
+    $paper = get_paper($db, $review['paper_id']);
+    if (!can_review_paper($event, $review)) {
+      return sems_forbidden("You may not complete this paper review at this time.");
+    }
+    $authors = stable($db, "SELECT User.user_id, title,first_name,middle_name,last_name FROM PaperAuthor,User WHERE PaperAuthor.user_id=User.user_id AND PaperAuthor.paper_id=?", array($paper['paper_id']));
+    $revisions = scol($db, "SELECT revision_date FROM PaperVersion WHERE paper_id=? ORDER BY revision_date DESC", array($paper['paper_id']));
+
+    if ($review['external_reviewer_id'] > 0) {
+      $review['external_reviewer_email'] = sone($db, "SELECT email FROM User WHERE user_id=?", array($review['external_reviewer_id']));
+    }
+
+    if (count($_POST) > 0) {
+      $rules = array(
+        'score' => array('required', 'valid_scale'),
+        'confidence' => array('required', 'valid_scale'),
+        'originality' => array('required', 'valid_originality'),
+        'strong_point' => array('required'),
+        'review_comments' => array(),
+        'author_comments' => array(),
+        'chair_comments' => array(),
+        'external_reviewer_email' => array('valid_email', 'email_to_id'));
+      list($success, $data) = sems_validate($_POST, $rules, $errors);
+      if ($success) {
+        $data['external_reviewer_id'] = $data['external_reviewer_email'];
+        list($sql, $params) = generate_update($db, 'PaperReview', array(
+          'score',
+          'confidence',
+          'originality',
+          'strong_point',
+          'review_comments',
+          'author_comments',
+          'chair_comments',
+          'external_reviewer_id'), $data, qeq('review_id', $rid));
+        $rows_affected = affect($db, $sql, $params);
+        $saved = true;
+      }
+    }
+    $vars = array(
+      'conf' => $conf,
+      'event' => $event,
+      'paper' => $paper,
+      'authors' => $authors,
+      'revisions' => $revisions,
+      'review' => $review,
+      'errors' => $errors,
+      'saved' => $saved);
+    return ok(sems_smarty_fetch('review/details.tpl', $vars));
+  });
 }
 
 function sems_reviews_auction_url($cid, $eid) { return sems_reviews_url($cid, $eid) . "/auction"; }
@@ -95,3 +148,8 @@ function sems_reviews_assign($cid, $eid) {
     return ok(sems_smarty_fetch('review/assign.tpl', $vars));
   });
 }
+
+function get_review(mysqli $db, $rid) {
+  return srow($db, "SELECT * FROM PaperReview WHERE review_id=?", array($rid));
+}
+

@@ -69,3 +69,6 @@ function sems_paper($cid, $eid, $pid) {
   // XXX
 }
 
+function get_paper(mysqli $db, $pid) {
+  return srow($db, "SELECT * FROM Paper WHERE paper_id=?", array($pid));
+}
