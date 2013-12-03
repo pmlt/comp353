@@ -57,3 +57,41 @@ function sems_reviews_auction ($cid, $eid) {
     return ok(sems_smarty_fetch('review/auction.tpl', $vars));
   });
 }
+
+function sems_reviews_assign_url($cid, $eid) { return sems_reviews_url($cid, $eid) . "/assign"; }
+function sems_reviews_assign($cid, $eid) {
+  return sems_db(function($db) use($cid, $eid) {
+    $conf = get_conference($db, $cid);
+    $event = get_event($db, $cid, $eid);
+    if (!$conf || !$event) return sems_notfound();
+
+    if (!can_assign_paper_reviews($event)) {
+      return sems_forbidden("You may not assign paper reviews at this time.");
+    }
+
+    if (count($_POST)) {
+      foreach ($_POST as $k => $v) {
+        if ($k == 'revoke') {
+          affect($db, "DELETE FROM PaperReview WHERE review_id=?", array($v));
+        }
+        else if ($k == 'assign') {
+          list($pid,$uid) = explode(',', $v, 2);
+          insert($db, "INSERT INTO PaperReview (paper_id,reviewer_id) VALUES(?,?)", array($pid,$uid));
+        }
+      }
+    }
+    
+    //Fetch list of reviews already assigned
+    $reviews = stable($db, "SELECT Paper.paper_id,review_id,Paper.title,CONCAT(first_name, ' ', last_name) AS reviewer FROM PaperReview,Paper,User WHERE PaperReview.paper_id=Paper.paper_id AND PaperReview.reviewer_id=User.user_id AND event_id=?", array($eid));
+
+    //Fetch list of bids that have not been assigned a review
+    $bids = stable($db, "SELECT Paper.paper_id,PaperBid.user_id,Paper.title,CONCAT(first_name, ' ', last_name) AS bidder FROM PaperBid,Paper,User WHERE Paper.paper_id=PaperBid.paper_id AND PaperBid.user_id=User.user_id AND event_id=? AND NOT EXISTS(SELECT * FROM PaperReview WHERE reviewer_id=PaperBid.user_id AND paper_id=Paper.paper_id)", array($eid));
+
+    $vars = array(
+      'conf' => $conf,
+      'event' => $event,
+      'reviews' => $reviews,
+      'bids' => $bids);
+    return ok(sems_smarty_fetch('review/assign.tpl', $vars));
+  });
+}

@@ -131,6 +131,7 @@ CREATE TABLE `PaperBid` (
 
 DROP TABLE IF EXISTS `PaperReview`;
 CREATE TABLE `PaperReview` (
+  `review_id` INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `paper_id` INT(11) NOT NULL,
   `reviewer_id` INT(11) NOT NULL,
   `score` INT(2) DEFAULT NULL,
@@ -141,7 +142,7 @@ CREATE TABLE `PaperReview` (
   `author_comments` TEXT NOT NULL,
   `chair_comments` TEXT NOT NULL,
   `external_reviewer_id` INT(11) DEFAULT NULL,
-  PRIMARY KEY (`paper_id`,`reviewer_id`),
+  UNIQUE KEY `unique_review` (`paper_id`,`reviewer_id`),
   CONSTRAINT `fk_PaperReview_paper_id` FOREIGN KEY `paper_id` (`paper_id`) REFERENCES `Paper` (`paper_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_PaperReview_reviewer_id` FOREIGN KEY `reviewer_id` (`reviewer_id`) REFERENCES `User` (`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_PaperReview_external_reviewer_id` FOREIGN KEY `external_reviewer_id` (`external_reviewer_id`) REFERENCES `User` (`user_id`) ON DELETE RESTRICT ON UPDATE CASCADE

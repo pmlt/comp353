@@ -42,6 +42,7 @@ function sems_routes() {
     //Review routes
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews$|" => 'sems_reviews',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/auction$|" => 'sems_reviews_auction',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/assign$|" => 'sems_reviews_assign',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/(\w+)$|" => 'sems_review',
 
     //Message routes

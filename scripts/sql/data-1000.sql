@@ -328,8 +328,8 @@ INSERT INTO `PaperBid` VALUES
 (5, 2);
 
 INSERT INTO `PaperReview` VALUES
-(1, 4, NULL, NULL, NULL, '', '', '', '', NULL),
-(2, 5, 3, 4, 'bad', 'Well-written.', 'This isn\'t really about math per se.', 'Are you sure this belongs to the symposium?', 'This seems more philosophical in nature than purely scientific.', NULL);
+(1, 1, 4, NULL, NULL, NULL, '', '', '', '', NULL),
+(2, 2, 5, 3, 4, 'bad', 'Well-written.', 'This isn\'t really about math per se.', 'Are you sure this belongs to the symposium?', 'This seems more philosophical in nature than purely scientific.', NULL);
 
 INSERT INTO `Message` VALUES
 (1, 1, 2, '2014-01-02 00:00:00', b'1', 'Submissions are open!', 'Hi, this is Jerry.  This is just to...', 'Hi, this is Jerry. This is just to let you know that the event is officially open for paper submissions.'),
