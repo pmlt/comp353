@@ -323,6 +323,10 @@ INSERT INTO `PaperVersion` VALUES
 (1, '2014-01-02 10:00:00'),
 (2, '2014-01-02 14:00:00');
 
+INSERT INTO `PaperBid` VALUES
+(4, 1),
+(5, 2);
+
 INSERT INTO `PaperReview` VALUES
 (1, 4, NULL, NULL, NULL, '', '', '', '', NULL),
 (2, 5, 3, 4, 'bad', 'Well-written.', 'This isn\'t really about math per se.', 'Are you sure this belongs to the symposium?', 'This seems more philosophical in nature than purely scientific.', NULL);

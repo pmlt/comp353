@@ -120,6 +120,15 @@ CREATE TABLE `PaperVersion` (
   CONSTRAINT `fk_PaperVersion_paper_id` FOREIGN KEY `paper_id` (`paper_id`) REFERENCES `Paper` (`paper_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARACTER SET='utf8';
 
+DROP TABLE IF EXISTS `PaperBid`;
+CREATE TABLE `PaperBid` (
+  `user_id` INT(11) NOT NULL,
+  `paper_id` INT(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`paper_id`),
+  CONSTRAINT `fk_PaperBid_user_id` FOREIGN KEY `user_id` (`user_id`) REFERENCES `User` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_PaperBid_paper_id` FOREIGN KEY `paper_id` (`paper_id`) REFERENCES `Paper` (`paper_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARACTER SET='utf8';
+
 DROP TABLE IF EXISTS `PaperReview`;
 CREATE TABLE `PaperReview` (
   `paper_id` INT(11) NOT NULL,
