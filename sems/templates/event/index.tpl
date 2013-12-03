@@ -43,4 +43,13 @@
     <td>{sems_datetime($event.end_date)}</td>
   </tr>
 </table>
+
+<p>Messages:</p>
+
+{foreach $messages as $message}
+<h3><a href="{sems_message_url($conf.conference_id, $event.event_id, $message.message_id)}">{$message.title}</a></h3>
+<p>{$message.excerpt}</p>
+
+{/foreach}
+
 {/block}

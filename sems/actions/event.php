@@ -20,6 +20,10 @@ function sems_event($cid, $eid) {
     //Get the list of topics for this event
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "EventTopic", "event_id", $eid));
 
+    //Get the list of messages for this event
+    // XXX must check for is_public
+    $vars['messages'] = stable($db, "SELECT * FROM Message WHERE event_id=? ORDER BY publish_date DESC", array($eid));
+
     return ok(sems_smarty_fetch('event/index.tpl', $vars));
   });
 }

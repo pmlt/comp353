@@ -179,7 +179,6 @@ function valid_upload($value) {
 }
 
 function valid_pdf($value) {
-  var_dump($_FILES);
   $file = exec('file ' . escapeshellarg($_FILES['file']['tmp_name']));
   if (FALSE !== strpos('PDF document', $file)) {
     return array(true, $value);
@@ -187,4 +186,8 @@ function valid_pdf($value) {
   else {
     return array(false, "File is not a PDF: {$file}");
   }
+}
+
+function valid_boolean($value) {
+  return array(true, $value == TRUE);
 }
