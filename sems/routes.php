@@ -5,6 +5,7 @@ include 'actions/conference.php';
 include 'actions/event.php';
 include 'actions/message.php';
 include 'actions/paper.php';
+include 'actions/review.php';
 
 define('SEMS_ROOT', '/comp353');
 $HTTP_ROOT = '/comp353';
@@ -37,8 +38,11 @@ function sems_routes() {
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers$|" => 'sems_papers',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/submit$|" => 'sems_papers_submit',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/(\w+)$|" => 'sems_paper',
+
+    //Review routes
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews$|" => 'sems_reviews',
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/review/(\w+)$|" => 'sems_review',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/auction$|" => 'sems_reviews_auction',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/(\w+)$|" => 'sems_review',
 
     //Message routes
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/messages/create$|" => 'sems_messages_create',

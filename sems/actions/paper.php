@@ -13,6 +13,10 @@ function sems_papers_submit($cid, $eid) {
     $conf = get_conference($db, $cid);
     if (!$event || !$conf) return sems_notfound();
 
+    if (!can_submit_papers($event)) {
+      return new sems_forbidden("You may not submit new papers for this event at this time.");
+    }
+
     $vars = array();
     $vars['event'] = $event;
     $vars['conf'] = $conf;
@@ -65,12 +69,3 @@ function sems_paper($cid, $eid, $pid) {
   // XXX
 }
 
-function sems_reviews_url($cid, $eid) { return sems_url($cid, $eid)."/reviews"; }
-function sems_reviews($cid, $eid) {
-  // XXX
-}
-
-function sems_review_url($cid, $eid, $rid) { return sems_reviews_url($cid, $eid)."/{$rid}"; }
-function sems_review($cid, $eid, $rid) {
-  // XXX
-}

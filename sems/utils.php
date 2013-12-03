@@ -11,18 +11,26 @@ function sems_datetime($date) {
   return date('j F Y', $time) . ' at ' . date('H:i', $time);
 }
 
+function sems_paper_download_url($paper_id, $revision) {
+  return SEMS_ROOT."/uploads/".sems_paper_filename($paper_id, $revision);
+}
+
 function sems_paper_filename($paper_id, $revision) {
   $revision = date('Ymd-His', strtotime($revision));
   return sprintf("paper_%06d_%s.pdf", $paper_id, $revision);
 }
 
+function sems_save_membership(mysqli $db, $table, $field1, $field2, $id, $ids) {
+  affect($db, "DELETE FROM {$table} WHERE {$field1}=?", array($id));
+  foreach ($ids as $linked_id) {
+    insert($db, "INSERT INTO {$table} ({$field1},{$field2}) VALUES(?,?)", array($id, $linked_id));
+  }
+}
+
 /********** USER SELECTION *************/
 
 function sems_save_user_selection(mysqli $db, $table, $field, $id, $uids) {
-  affect($db, "DELETE FROM {$table} WHERE {$field}=?", array($id));
-  foreach ($uids as $uid) {
-    insert($db, "INSERT INTO {$table} ({$field},user_id) VALUES(?,?)", array($id, $uid));
-  }
+  return sems_save_membership($db, $table, $field, 'user_id', $id, $uids);
 }
 
 /********** TOPICS **************/

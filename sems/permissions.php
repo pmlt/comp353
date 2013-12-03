@@ -28,6 +28,7 @@ function can_manage_committee($event, Identity $identity=null) {
 
 function can_submit_papers($event, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
+  if ('submit' != sems_event_state($event)) return false; // Can only submit in the right period
   return $event['chair_id'] != $identity->UserId;
 }
 
@@ -64,27 +65,34 @@ function can_edit_message($event, $message, Identity $identity=null) {
   return $event['chair_id'] != $identity->UserId;
 }
 
-function can_bid_for_papers($event, Identity $identity=null) {
+function can_bid_for_papers($event, $committee, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
+  if ('auction' != sems_event_state($event)) return false; // Can only bid in the right period
   return in_array($identity->UserId, $committee);
 }
 
 function can_assign_paper_reviews($event, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
+  $state = sems_event_state($event);
+  // Can only assign papers during specific periods
+  if ($state != 'auction' && $state != 'auction_ended' && $state != 'review') return false;
   return $event['chair_id'] == $identity->UserId;
 }
 
 function can_review_paper($event, $paper, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
+  if ('review' != sems_event_state($event)) return false; // Can only review in the right period
   return $paper['reviewer_id'] == $identity->UserId;
 }
 
 function can_accept_papers($event, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
+  if ('review_ended' != sems_event_state($event)) return false; // Can only accept in the right period
   return $event['chair_id'] == $identity->UserId;
 }
 
 function can_epublish_papers($event, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
+  if ('decision' != sems_event_state($event)) return false; // Can only publish after decision is made
   return $event['chair_id'] == $identity->UserId;
 }
