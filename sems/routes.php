@@ -78,8 +78,9 @@ function sems_notfound() {
   });
 }
 
-function sems_forbidden() {
-  return sems_smarty(function($smarty) {
+function sems_forbidden($reason="") {
+  return sems_smarty(function($smarty) use($reason) {
+    $smarty->assign('reason', $reason);
     return forbidden($smarty->fetch('forbidden.tpl'));
   });
 }

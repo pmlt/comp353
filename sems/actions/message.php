@@ -13,7 +13,10 @@ function sems_message($cid, $eid, $mid) {
     $message = get_message($db, $mid);
     if (!$conf || !$event || !$message) return sems_notfound();
 
-    // XXX check publish_date/is_public switch (need better identity checks)
+    $committee = get_event_committee_ids($db, $event);
+    if (!can_view_message($event, $message, $committee)) {
+      return sems_forbidden("You may not view this message's details.");
+    }
 
     $author = sems_create_identity($db, $message['user_id']);
 
@@ -34,8 +37,8 @@ function sems_messages_create($cid, $eid) {
     if (!$event) return sems_notfound();
 
     // Check that this user can create a new message
-    if (!sems_identity_permission(sems_get_identity(), array('user_id', $event['chair_id']))) {
-      return sems_forbidden();
+    if (!can_post_message($event)) {
+      return sems_forbidden("You may not post new messages for this event.");
     }
 
     $vars = array();
@@ -80,9 +83,8 @@ function sems_message_edit($cid, $eid, $mid) {
     $message = get_message($db, $mid);
     if (!$message) return sems_notfound();
 
-    // Check that this user can create a new message
-    if (!sems_identity_permission(sems_get_identity(), array('user_id', $event['chair_id']))) {
-      return sems_forbidden();
+    if (!can_edit_message($event, $message)) {
+      return sems_forbidden("You may not edit this message's details.");
     }
 
     $vars = array();

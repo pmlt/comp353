@@ -37,8 +37,8 @@ function sems_conference_search($conf) {
 
 function sems_conference_create_url() { return SEMS_ROOT.'/create'; }
 function sems_conference_create() {
-  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
-    return sems_forbidden();
+  if (!can_create_conference()) {
+    return sems_forbidden("You are not allowed to create new conferences.");
   }
   return sems_db(function($db) {
     $vars = array();
@@ -69,12 +69,13 @@ function sems_conference_create() {
 
 function sems_conference_edit_url($cid) { return sems_conference_url($cid) . "/edit"; }
 function sems_conference_edit($cid) {
-  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
-    return sems_forbidden();
-  }
   return sems_db(function($db) use($cid) {
     $conf = get_conference($db, $cid);
     if (!$conf) return sems_notfound();
+
+    if (!can_edit_conference($conf)) {
+      return sems_forbidden("You are not allowed to modify this conference.");
+    }
 
     //Get the program chair
     $chair = sems_create_identity($db, $conf['chair_id']);

@@ -21,8 +21,9 @@ function sems_event($cid, $eid) {
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "EventTopic", "event_id", $eid));
 
     //Get the list of messages for this event
-    // XXX must check for is_public
-    $vars['messages'] = stable($db, "SELECT * FROM Message WHERE event_id=? ORDER BY publish_date DESC", array($eid));
+    $committee = get_event_committee_ids($db, $eid);
+    $where = get_message_conditions($event, $committee);
+    $vars['messages'] = stable($db, "SELECT * FROM Message WHERE ".$where->sql." ORDER BY publish_date DESC", $where->params);
 
     return ok(sems_smarty_fetch('event/index.tpl', $vars));
   });
@@ -31,8 +32,8 @@ function sems_event($cid, $eid) {
 
 function sems_event_create_url($cid) { return sems_conference_url($cid)."/create"; }
 function sems_event_create($cid) {
-  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
-    return sems_forbidden();
+  if (!can_create_event()) {
+    return sems_forbidden("You are not allowed to create new events.");
   }
   return sems_db(function($db) use($cid) {
     $conf = get_conference($db, $cid);
@@ -93,12 +94,12 @@ function sems_event_create($cid) {
 
 function sems_event_edit_url($cid, $eid) { return sems_event_url($cid, $eid)."/edit"; }
 function sems_event_edit($cid, $eid) {
-  if (!sems_identity_permission(sems_get_identity(), array('role', 'admin'))) {
-    return sems_forbidden();
-  }
   return sems_db(function($db) use($cid, $eid) {
     $event = get_event($db, $cid, $eid);
     if (!$event) return sems_notfound();
+    if (!can_edit_event($event)) {
+      return sems_forbidden("You are not allowed to modify this event.");
+    }
 
     $chair = sems_create_identity($db, $event['chair_id']);
     $conf['chair_email'] = $chair->UserData['email'];
@@ -162,8 +163,8 @@ function sems_event_committee($cid, $eid) {
     $event = get_event($db, $cid, $eid);
     if (!$event) return sems_notfound();
 
-    if (!sems_identity_permission(sems_get_identity(), array('user_id', $event['chair_id']))) {
-      return sems_forbidden();
+    if (!can_manage_committee($event)) {
+      return sems_forbidden("You may not manage this event's committee membership");
     }
     $vars = array();
     $vars['event'] = $event;
@@ -196,6 +197,10 @@ function get_event(mysqli $db, $cid, $eid) {
 
 function get_event_committee(mysqli $db, $eid) {
   return stable($db, "SELECT User.user_id, User.email FROM User,CommitteeMembership AS ec WHERE ec.user_id=User.user_id AND ec.event_id=?", array($eid));
+}
+
+function get_event_committee_ids(mysqli $db, $eid) {
+  return scol($db, "SELECT user_id FROM CommitteeMembership WHERE event_id=?", array($eid));
 }
 
 $event_states = array(

@@ -45,7 +45,7 @@ class SqlCond {
 
 function qeq($field, $value) { return qcond('=', $field, $value); }
 function qcond($op, $field, $value) {
-  return new SqlCond("$field = ?", array($value));
+  return new SqlCond("$field $op ?", array($value));
 }
 function qand(array $conds) { return qgroup('AND', $conds); }
 function qor(array $conds) { return qgroup('OR', $conds); }
@@ -56,6 +56,7 @@ function qgroup($separator, array $conds) {
   $params = call_user_func_array('array_merge', array_map(function(SqlCond $cond) {
     return $cond->params;
   }, $conds));
+  return new SqlCond($sql, $params);
 }
 
 function generate_insert(mysqli $db, $table, $fields, $values, $literal_exceptions=array()) {
