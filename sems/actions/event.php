@@ -25,6 +25,12 @@ function sems_event($cid, $eid) {
     $where = get_message_conditions($event, $committee);
     $vars['messages'] = stable($db, "SELECT * FROM Message WHERE ".$where->sql." ORDER BY publish_date DESC", $where->params);
 
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc_event($event));
+    $vars['actions'] = sems_event_actions($conf, $event, $committee);
+
     return ok(sems_smarty_fetch('event/index.tpl', $vars));
   });
 }
@@ -88,6 +94,10 @@ function sems_event_create($cid) {
       }
     }
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc('Create a new event', sems_event_create_url($conf['conference_id'])));
     return ok(sems_smarty_fetch('event/create.tpl', $vars));
   });
 }
@@ -96,7 +106,8 @@ function sems_event_edit_url($cid, $eid) { return sems_event_url($cid, $eid)."/e
 function sems_event_edit($cid, $eid) {
   return sems_db(function($db) use($cid, $eid) {
     $event = get_event($db, $cid, $eid);
-    if (!$event) return sems_notfound();
+    $conf = get_conference($db, $cid);
+    if (!$conf || !$event) return sems_notfound();
     if (!can_edit_event($event)) {
       return sems_forbidden("You are not allowed to modify this event.");
     }
@@ -104,9 +115,11 @@ function sems_event_edit($cid, $eid) {
     $chair = sems_create_identity($db, $event['chair_id']);
     $conf['chair_email'] = $chair->UserData['email'];
 
+    $committee = get_event_committee_ids($db, $eid);
+
     $vars = array();
     $vars['event'] = $event;
-    $vars['conf'] = get_conference($db, $cid);
+    $vars['conf'] = $conf;
     $vars['chair'] = $chair;
 
     if (count($_POST) > 0) {
@@ -153,22 +166,29 @@ function sems_event_edit($cid, $eid) {
       }
     }
     $vars['hierarchy'] = sems_topic_hierarchy(sems_select_topics(sems_fetch_topics($db), sems_fetch_topic_selection($db, 'EventTopic', 'event_id', $eid)));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc_event($conf, $event),
+      sems_bc('Modify details', sems_event_edit_url($conf['conference_id'], $event['event_id'])));
+    $vars['actions'] = sems_event_actions($conf, $event, $committee);
     return ok(sems_smarty_fetch('event/edit.tpl', $vars));
   });
 }
 
-function sems_event_committee_url($cid, $eic) { return sems_event_url($cid, $eid)."/committee"; }
+function sems_event_committee_url($cid, $eid) { return sems_event_url($cid, $eid)."/committee"; }
 function sems_event_committee($cid, $eid) {
   return sems_db(function($db) use($cid,$eid) {
+    $conf = get_conference($db, $cid);
     $event = get_event($db, $cid, $eid);
-    if (!$event) return sems_notfound();
+    if (!$conf || !$event) return sems_notfound();
 
     if (!can_manage_committee($event)) {
       return sems_forbidden("You may not manage this event's committee membership");
     }
     $vars = array();
     $vars['event'] = $event;
-    $vars['conf'] = get_conference($db, $cid);
+    $vars['conf'] = $conf;
 
     if (isset($_POST['committee'])) {
       $rules = array('committee' => array('valid_user_references'));
@@ -183,8 +203,17 @@ function sems_event_committee($cid, $eid) {
       }
     }
 
+    //Get fresh version
+    $committee = get_event_committee_ids($db, $eid);
+
     // Fetch committee
     $vars['committee'] = get_event_committee($db, $eid);
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc_event($conf, $event),
+      sems_bc('Manage committee', sems_event_committee_url($cid, $eid)));
+    $vars['actions'] = sems_event_actions($conf, $event, $committee);
     return ok(sems_smarty_fetch('event/committee.tpl', $vars));
   });
 }
@@ -236,4 +265,16 @@ function sems_event_state($event) {
 function sems_event_state_str($state) {
   global $event_states;
   return $event_states[$state];
+}
+
+function sems_event_actions($conf, $event, $committee) {
+  return sems_actions(
+    sems_action_edit_event($conf, $event),
+    sems_action_manage_committee($conf, $event),
+    sems_action_submit_paper($conf, $event),
+    sems_action_post_message($conf, $event),
+    sems_action_bid($conf, $event, $committee),
+    sems_action_assign($conf, $event),
+    sems_action_accept($conf, $event),
+    sems_action_epublish($conf, $event));
 }

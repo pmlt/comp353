@@ -1,18 +1,19 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
-{block name='title'}{$conf.name}{/block}
 {block name='content'}
-<h2>{$event.title}</h2>
 
 <p>{$event.description}</p>
 
-<p>Topics of interest are: {include file="ui/topic_hierarchy.tpl"}</p>
+<h3>Topics of interest</h3>
+{include file="ui/topic_hierarchy.tpl"}
 
-<p>Program chair: {$chair->fullname()}</p>
+<h3>Program chair</h3>
+<p>{$chair->fullname()}</p>
 
-<p>Current status: {sems_event_state_str(sems_event_state($event))}</p>
+<h3>Current status</h3>
+<p>{sems_event_state_str(sems_event_state($event))}</p>
 
-<p>Schedule for this event:</p>
+<h3>Schedule for this event:</h3>
 
 <table>
   <tr>
@@ -44,10 +45,10 @@
   </tr>
 </table>
 
-<p>Messages:</p>
+<h3>Messages</h3>
 
 {foreach $messages as $message}
-<h3><a href="{sems_message_url($conf.conference_id, $event.event_id, $message.message_id)}">{$message.title}</a></h3>
+<h4><a href="{sems_message_url($conf.conference_id, $event.event_id, $message.message_id)}">{$message.title}</a></h4>
 <p>{$message.excerpt}</p>
 
 {/foreach}

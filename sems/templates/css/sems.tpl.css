@@ -134,10 +134,6 @@ header {
   border-radius: 0 0 5px 5px;
 }
 
-#content p,#content form,#content table {
-  margin: 1em 0 1em 0;
-}
-
 #breadcrumb {
   font-size: 0.8em;
   margin: 1em 1em 1em 1em;
@@ -207,11 +203,17 @@ header {
   min-height: 20em;
 }
 
+#content p,#content form,#content table, #content h3 {
+  margin: 1em 0 1em 0;
+}
+
 #content strong { font-weight: bold; }
 #content th { font-weight: bold; }
+#content h3 { font-weight: bold; font-size: 1.2em; color: {$colors.heading_fg}; }
 
 #content table td {
   padding: 0.3em 0 0 0.3em;
+  vertical-align: top;
 }
 #content table tr td:first-child {
   min-width: 200px;
@@ -219,6 +221,10 @@ header {
 #content table input[type=text],
 #content table input[type=password] {
   min-width: 250px;
+}
+#content table textarea {
+  min-width: 250px;
+  min-height: 100px;
 }
 
 footer {

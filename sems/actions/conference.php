@@ -13,19 +13,18 @@ function sems_conference($cid) {
     $chair = sems_create_identity($db, $conf['chair_id']);
     $vars['chair'] = $chair;
     
-    //Possible actions
-    $vars['actions'] = sems_actions(
-      sems_action_edit_conference($conf),
-      sems_action_create_event($conf));
-
     //Get the list of topics for this conference
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "ConferenceTopic", "conference_id", $cid));
 
     //Get the list of events for this conference
     $vars['events'] = stable($db, "SELECT event_id, title, description, start_date FROM Event WHERE conference_id=? ORDER BY start_date", array($cid));
+
     $vars['breadcrumb'] = sems_breadcrumb(
       sems_bc_home(),
       sems_bc_conference($conf));
+    $vars['actions'] = sems_actions(
+      sems_action_edit_conference($conf),
+      sems_action_create_event($conf));
     return ok(sems_smarty_fetch('conference/index.tpl', $vars));
   });
 }

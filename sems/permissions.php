@@ -132,3 +132,68 @@ function sems_action_edit_event($conf, $event) {
     'url' => sems_event_edit_url($conf['conference_id'], $event['event_id']));
 }
 
+function sems_action_manage_committee($conf, $event) {
+  if (!can_manage_committee($event)) return null;
+  return array(
+    'label' => 'Manage this event\'s committee',
+    'url' => sems_event_committee_url($conf['conference_id'], $event['event_id']));
+}
+
+function sems_action_submit_paper($conf, $event) {
+  if (!can_submit_papers($event)) return null;
+  return array(
+    'label' => 'Submit a paper for this event',
+    'url' => sems_papers_submit_url($conf['conference_id'], $event['event_id']));
+}
+
+function sems_action_post_message($conf, $event) {
+
+  if (!can_post_message($event)) return null;
+  return array(
+    'label' => 'Post a new message',
+    'url' => sems_messages_create_url($conf['conference_id'], $event['event_id']));
+}
+
+function sems_action_bid($conf, $event, $committee) {
+  if (!can_bid_for_papers($event, $committee)) return null;
+  return array(
+    'label' => 'Bid for paper reviews',
+    'url' => sems_reviews_auction_url($conf['conference_id'], $event['event_id']));
+}
+
+function sems_action_assign($conf, $event) {
+  if (!can_assign_paper_reviews($event)) return null;
+  return array(
+    'label' => 'Assign paper reviews',
+    'url' => sems_reviews_assign_url($conf['conference_id'], $event['event_id']));
+}
+
+function sems_action_review($conf, $event, $review) {
+  if (!can_review_paper($event, $review)) return null;
+  return array(
+    'label' => 'Review this paper',
+    'url' => sems_review_edit_url($conf['conference_id'], $event['event_id'], $review['review_id']));
+}
+
+function sems_action_accept($conf, $event) {
+  if (!can_accept_papers($event)) return null;
+  return array(
+    'label' => 'Accept or reject papers',
+    'url' => sems_papers_decision_url($conf['conference_id'], $event['event_id']));
+}
+
+function sems_action_epublish($conf, $event) {
+  if (!can_epublish_papers($event)) return null;
+  return array(
+    'label' => 'ePublish accepted papers',
+    'url' => sems_papers_epublish_url($conf['conference_id'], $event['event_id']));
+
+}
+
+function sems_action_edit_message($conf, $event, $message) {
+  if (!can_edit_message($event, $message)) return null;
+  return array(
+    'label' => 'Modify this message',
+    'url' => sems_message_edit_url($conf['conference_id'], $event['event_id']));
+}
+

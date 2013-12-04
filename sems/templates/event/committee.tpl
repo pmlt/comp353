@@ -1,8 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
-{block name='title'}{$conf.name}{/block}
+{block name='content_title' append=true} - Manage committee{/block}
 {block name='content'}
-<h2>Manage committe for {$event.title}</h2>
 
 <script type="text/javascript">
 function updateField() {
