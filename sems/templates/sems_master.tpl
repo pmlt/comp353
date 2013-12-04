@@ -1,5 +1,5 @@
 {extends file="master.tpl"}
-{block name='title'}SEMS - Scholarly Event Management System{/block}
+{block name='title'}{foreach $breadcrumb as $bc name='bc'}{$bc.label}{if !$smarty.foreach.bc.last} &gt;{/if}{/foreach}{/block}
 
 {block name='head'}
 <link href="{sems_root()}/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet">

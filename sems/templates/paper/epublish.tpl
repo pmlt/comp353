@@ -1,7 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
+{block name='content_title' append=true} - ePublish papers{/block}
 {block name='content'}
-<h2>ePublish {$event.title} papers</h2>
 
 <script type="text/javascript">
 $(function() {

@@ -1,7 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
+{block name='content_title' append=true} - Accept/Reject papers{/block}
 {block name='content'}
-<h2>Final decisions for {$event.title} papers</h2>
 
 {$decisions = sems_paper_decision_options()}
 

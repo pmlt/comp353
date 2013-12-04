@@ -60,6 +60,12 @@ function sems_papers_submit($cid, $eid) {
       }
     }
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc_event($conf, $event),
+      sems_bc('Submit a new paper', sems_papers_submit_url($cid, $eid)));
+    $vars['actions'] = sems_event_actions($conf, $event);
     return ok(sems_smarty_fetch('paper/submit.tpl', $vars));
   });
 }
@@ -95,7 +101,13 @@ function sems_papers_decision($cid, $eid) {
       'event' => $event,
       'conf' => $conf,
       'papers' => $papers,
-      'saved' => $saved);
+      'saved' => $saved,
+      'breadcrumb' => sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event),
+        sems_bc('Submit a new paper', sems_papers_submit_url($cid, $eid))),
+      'actions' => sems_event_actions($conf, $event));
     return ok(sems_smarty_fetch('paper/decision.tpl', $vars));
   });
 }
@@ -145,7 +157,44 @@ function sems_papers_epublish($cid, $eid) {
 
 function sems_paper_url($cid, $eid, $pid) { return sems_papers_url($cid, $eid)."/{$pid}"; }
 function sems_paper($cid, $eid, $pid) {
-  // XXX
+  return sems_db(function($db) use($cid, $eid, $pid) {
+    $conf = get_conference($db, $cid);
+    $event = get_event($db, $cid, $eid);
+    $paper = get_paper($db, $pid);
+    if (!$conf || !$event || !$paper) return sems_notfound();
+
+    if (!can_view_paper($event, $paper, $committee)) {
+      return sems_forbidden("You may not view this paper at this time.");
+    }
+
+    $actions = sems_event_actions($conf, $event);
+    // Try to find a review assignment for current user
+    $ident = sems_get_identity();
+    if ($ident->UserId > 0) {
+      $review = srow($db, "SELECT * FROM PaperReview WHERE paper_id=? AND (reviewer_id=? OR external_reviewer_id=?)", array($pid, $ident->UserId, $ident->UserId));
+      if ($review) {
+        //Add this to the actions
+        $actions = array_merge($actions, sems_actions(sems_action_review($conf, $event, $review)));
+      }
+    }
+
+    $authors = stable($db, "SELECT User.user_id, title,first_name,middle_name,last_name FROM PaperAuthor,User WHERE PaperAuthor.user_id=User.user_id AND PaperAuthor.paper_id=?", array($paper['paper_id']));
+    $revisions = scol($db, "SELECT revision_date FROM PaperVersion WHERE paper_id=? ORDER BY revision_date DESC", array($paper['paper_id']));
+
+    $vars = array(
+      'conf' => $conf,
+      'event' => $event,
+      'paper' => $paper,
+      'authors' => $authors,
+      'revisions' => $revisions,
+      'breadcrumb' => sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event),
+        sems_bc_paper($conf, $event, $paper)),
+      'actions' => $actions);
+    return ok(sems_smarty_fetch('paper/details.tpl', $vars));
+  });
 }
 
 function get_paper(mysqli $db, $pid) {

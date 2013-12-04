@@ -45,6 +45,14 @@ function can_view_message($event, $message, $committee, $identity=null) {
   return true;
 }
 
+function can_view_paper($event, $paper, $committee, $identity=null) {
+  if (!$identity) $identity = sems_get_identity();
+  if ($event['chair_id'] == $identity->UserId) return true; //Chair can always view
+  if (in_array($identity->UserId, $committee)) return true; //Committee members can always view
+  if (sems_time() < strtotime($message['publish_date'])) return false; //Can't view unpublished papers
+  return true;
+}
+
 function get_message_conditions($event, $committee, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   $must_belong_to_event = qeq('event_id', $event['event_id']);
@@ -171,7 +179,7 @@ function sems_action_review($conf, $event, $review) {
   if (!can_review_paper($event, $review)) return null;
   return array(
     'label' => 'Review this paper',
-    'url' => sems_review_edit_url($conf['conference_id'], $event['event_id'], $review['review_id']));
+    'url' => sems_review_url($conf['conference_id'], $event['event_id'], $review['review_id']));
 }
 
 function sems_action_accept($conf, $event) {

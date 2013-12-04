@@ -1,8 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
+{block name='content_title' append=true} - Submit a new paper{/block}
 {block name='content'}
-<h2>Submit a new paper for {$event.title}</h2>
-
 <script type="text/javascript">
 function updateField() {
   var emails = [];
@@ -10,7 +9,6 @@ function updateField() {
     var i = $(this).find('input');
     if (i.length > 0) emails.push(i.val());
   });
-  console.log(emails);
   $('input[name=authors]').val(emails.join('|'));
 }
 

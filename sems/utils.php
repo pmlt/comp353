@@ -55,6 +55,14 @@ function sems_bc_message($conf, $event, $message) {
   return sems_bc($message['title'], sems_message_url($conf['conference_id'], $event['event_id'], $message['message_id']));
 }
 
+function sems_bc_paper($conf, $event, $paper) {
+  return sems_bc($paper['title'], sems_paper_url($conf['conference_id'], $event['event_id'], $paper['paper_id']));
+}
+
+function sems_bc_review($conf, $event, $paper, $review) {
+  return sems_bc($paper['title'], sems_review_url($conf['conference_id'], $event['event_id'], $review['review_id']));
+}
+
 
 /********** USER SELECTION *************/
 

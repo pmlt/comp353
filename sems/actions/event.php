@@ -28,7 +28,7 @@ function sems_event($cid, $eid) {
     $vars['breadcrumb'] = sems_breadcrumb(
       sems_bc_home(),
       sems_bc_conference($conf),
-      sems_bc_event($event));
+      sems_bc_event($conf, $event));
     $vars['actions'] = sems_event_actions($conf, $event, $committee);
 
     return ok(sems_smarty_fetch('event/index.tpl', $vars));
