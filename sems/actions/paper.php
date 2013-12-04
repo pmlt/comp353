@@ -64,6 +64,42 @@ function sems_papers_submit($cid, $eid) {
   });
 }
 
+function sems_papers_decision_url($cid, $eid) { return sems_papers_url($cid, $eid) . "/decision"; }
+function sems_papers_decision($cid, $eid) {
+  return sems_db(function($db) use($cid, $eid) {
+    $event = get_event($db, $cid, $eid);
+    $conf = get_conference($db, $cid);
+    if (!$event || !$conf) return sems_notfound();
+
+    if (!can_accept_papers($event)) {
+      return sems_forbidden("You may not accept or reject papers for this event at this time.");
+    }
+
+    if (count($_POST) > 0) {
+      foreach ($_POST as $k => $v) {
+        if (preg_match('/paper_(\d+)/', $k, $matches)) {
+          affect($db, "UPDATE Paper SET decision=?, decision_date=NOW() WHERE paper_id=?", array($v, $matches[1]));
+          $saved = true;
+        }
+      }
+    }
+
+    $papers = stable($db, "SELECT Paper.paper_id, Paper.title, Paper.decision, User.user_id, User.first_name, User.last_name FROM Paper,User WHERE Paper.submitter_id=User.user_id AND event_id=?", array($eid));
+
+    foreach ($papers as &$paper) {
+      //Load all reviews for this paper
+      $paper['reviews'] = stable($db, "SELECT * FROM PaperReview,User WHERE PaperReview.reviewer_id=User.user_id AND paper_id=?", array($paper['paper_id']));
+    }
+
+    $vars = array(
+      'event' => $event,
+      'conf' => $conf,
+      'papers' => $papers,
+      'saved' => $saved);
+    return ok(sems_smarty_fetch('paper/decision.tpl', $vars));
+  });
+}
+
 function sems_paper_url($cid, $eid, $pid) { return sems_papers_url($cid, $eid)."/{$pid}"; }
 function sems_paper($cid, $eid, $pid) {
   // XXX

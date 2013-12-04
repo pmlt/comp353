@@ -37,6 +37,7 @@ function sems_routes() {
     //Paper routes
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers$|" => 'sems_papers',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/submit$|" => 'sems_papers_submit',
+    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/decision$|" => 'sems_papers_decision',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/(\w+)$|" => 'sems_paper',
 
     //Review routes
