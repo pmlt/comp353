@@ -18,7 +18,7 @@ class HttpResult {
   }
 }
 
-function ok($body) { return new HttpResult(200, $body, array()); }
+function ok($body, $headers=array()) { return new HttpResult(200, $body, $headers); }
 function movedPermanently($url) { return new HttpResult(301, "", array("Location: $url")); }
 function found($url) { return new HttpResult(302, "", array("Location: $url")); }
 function forbidden($body) { return new HttpResult(403, $body, array()); }
