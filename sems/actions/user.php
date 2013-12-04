@@ -23,6 +23,9 @@ function sems_login() {
     if ($redirect) return $redirect;
     else $smarty_vars['login_failed'] = true;
   }
+  $smarty_vars['breadcrumb'] = sems_breadcrumb(
+    sems_bc_home(),
+    sems_bc('Sign-in', sems_login_url()));
   return ok(sems_smarty_fetch('user/login.tpl', $smarty_vars));
 }
 
@@ -44,11 +47,17 @@ function sems_signup() {
     if (count($_POST) > 0) {
       // First, validate all parameters.
       $rules = array(
+        'title' => array(),
         'first_name' => array('required'),
+        'middle_name' => array(),
         'last_name' => array('required'),
         'country_id' => array('required','valid_country_id'),
         'organization_id' => array('required','valid_organization_id'),
         'department' => array('required'),
+        'address' => array(),
+        'city' => array(),
+        'province' => array(),
+        'postcode' => array(),
         'email' => array('required','valid_email','match_confirm','unique_email'),
         'password' => array('required','match_confirm'));
       list($success, $data) = sems_validate($_POST, $rules, $errors);
@@ -71,6 +80,9 @@ function sems_signup() {
     $smarty_vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $smarty_vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
     $smarty_vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    $smarty_vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc('Signup', sems_signup_url()));
     return ok(sems_smarty_fetch('user/signup.tpl', $smarty_vars));
   });
 }
@@ -114,6 +126,9 @@ function sems_profile($uid) {
     $vars['organization'] = sone($db, "SELECT name FROM Organization WHERE organization_id=?", array($ident->UserData['organization_id']));
     $vars['country'] = sone($db, "SELECT name FROM Country WHERE country_id=?", array($ident->UserData['country_id']));
 
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_profile($ident));
     return ok(sems_smarty_fetch("user/profile.tpl", $vars));
   });
 }
@@ -136,11 +151,17 @@ function sems_profile_edit($uid) {
     $vars['errors'] = array();
     if (count($_POST) > 0) {
       $rules = array(
+        'title' => array(),
         'first_name' => array('required'),
+        'middle_name' => array(),
         'last_name' => array('required'),
         'country_id' => array('required','valid_country_id'),
         'organization_id' => array('required','valid_organization_id'),
-        'department' => array('required'));
+        'department' => array('required'),
+        'address' => array(),
+        'city' => array(),
+        'province' => array(),
+        'postcode' => array());
       list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
         //Edit user data then return to profile
@@ -160,6 +181,10 @@ function sems_profile_edit($uid) {
     $vars['organizations'] = sassoc($db, "SELECT organization_id, name FROM Organization ORDER BY name");
     $vars['countries'] = sassoc($db, "SELECT country_id, name FROM Country ORDER BY name");
     $vars['hierarchy'] = sems_topic_hierarchy(sems_select_topics(sems_fetch_topics($db), $ident->Topics));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_profile($ident),
+      sems_bc('Edit profile details', sems_profile_edit_url($ident->UserId)));
     return ok(sems_smarty_fetch("user/profile_edit.tpl", $vars));
   });
 }

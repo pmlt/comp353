@@ -3,7 +3,7 @@
 
 {block name='head'}
 <link href="{sems_root()}/css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet">
-<link href="css/sems.css" rel="stylesheet"/>
+<link href="{sems_root()}/css/sems.css" rel="stylesheet"/>
 <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="{sems_root()}/js/jquery-ui-1.10.3.custom.min.js"></script>
 {* <script src="scripts/sems.js"></script> *}
@@ -21,11 +21,7 @@
 {/block}
 
 <div id="breadcrumb">
-<ul>
-  <li><a href="#">Home</a></li>
-  <li><a href="#">Conference</a></li>
-  <li><a href="#">Event</a></li>
-</ul>
+{include file="ui/breadcrumb.tpl"}
 </div>
 
 <div id="content">
@@ -36,7 +32,6 @@
 <div class="content-wrapper">
 {block name='content'}{/block}
 </div>
-</div>
 
 {block name='footer'}
 <footer>
@@ -44,6 +39,7 @@
 </footer>
 {/block}
 
+</div> {* Content wrapper *}
 </div> {* Body *}
 
 {/block}

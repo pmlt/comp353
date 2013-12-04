@@ -27,6 +27,21 @@ function sems_save_membership(mysqli $db, $table, $field1, $field2, $id, $ids) {
   }
 }
 
+/********** BREADCRUMB *****************/
+
+function sems_breadcrumb() {
+  return func_get_args();
+}
+
+function sems_bc($label, $url) {
+  return array('label' => $label, 'url' => $url);
+}
+
+function sems_bc_home() { return sems_bc('SEMS Home', sems_home_url()); }
+
+function sems_bc_profile(Identity $ident) { return sems_bc($ident->fullname(), sems_profile_url($ident->UserId)); }
+
+
 /********** USER SELECTION *************/
 
 function sems_save_user_selection(mysqli $db, $table, $field, $id, $uids) {

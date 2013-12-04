@@ -79,7 +79,9 @@ function sems_home() {
         'url' => sems_conference_create_url(),
         'label' => 'Create a new conference',
         'permission' => array('role','admin')));
-    $vars['actions'] = sems_identity_actions(sems_get_identity(), $actions);
+
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home());
     return ok(sems_smarty_fetch('home.tpl', $vars));
   });
 }
