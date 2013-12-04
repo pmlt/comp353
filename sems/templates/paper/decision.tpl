@@ -3,15 +3,7 @@
 {block name='content'}
 <h2>Final decisions for {$event.title} papers</h2>
 
-{$decisions = [
-  "pending" => "Pending",
-  "full" => "Full",
-  "short" => "Short",
-  "poster" => "Poster",
-  "workshop" => "Workshop",
-  "position" => "Position",
-  "demo" => "Demo",
-  "rejected" => "Rejected"]}
+{$decisions = sems_paper_decision_options()}
 
 <form method="post">
 {foreach $papers as $paper}

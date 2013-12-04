@@ -100,6 +100,49 @@ function sems_papers_decision($cid, $eid) {
   });
 }
 
+function sems_papers_epublish_url($cid, $eid) { return sems_papers_url($cid, $eid) . "/epublish"; }
+function sems_papers_epublish($cid, $eid) {
+  return sems_db(function($db) use($cid, $eid) {
+    $event = get_event($db, $cid, $eid);
+    $conf = get_conference($db, $cid);
+    if (!$event || !$conf) return sems_notfound();
+
+    if (!can_epublish_papers($event)) {
+      return sems_forbidden("You may not accept or reject papers for this event at this time.");
+    }
+
+    if (count($_POST) > 0) {
+      foreach ($_POST as $k => $v) {
+        if (preg_match('/paper_(\d+)/', $k, $matches)) {
+          list($valid, $date) = valid_date($v);
+          if ($valid) {
+            affect($db, "UPDATE Paper SET publish_date=? WHERE paper_id=?", array($date, $matches[1]));
+            $saved = true;
+          }
+          else {
+            affect($db, "UPDATE Paper SET publish_date=NULL WHERE paper_id=?", array($matches[1]));
+            $saved = true;
+          }
+        }
+      }
+    }
+
+    $papers = stable($db, "SELECT * FROM Paper WHERE event_id=? AND decision != 'rejected'", array($eid));
+
+    foreach($papers as &$paper) {
+      $paper['authors'] = stable($db, "SELECT User.user_id, title,first_name,middle_name,last_name FROM PaperAuthor,User WHERE PaperAuthor.user_id=User.user_id AND PaperAuthor.paper_id=?", array($paper['paper_id']));
+      $paper['revisions'] = scol($db, "SELECT revision_date FROM PaperVersion WHERE paper_id=? ORDER BY revision_date DESC", array($paper['paper_id']));
+    }
+
+    $vars = array(
+      'event' => $event,
+      'conf' => $conf,
+      'papers' => $papers,
+      'saved' => $saved);
+    return ok(sems_smarty_fetch('paper/epublish.tpl', $vars));
+  });
+}
+
 function sems_paper_url($cid, $eid, $pid) { return sems_papers_url($cid, $eid)."/{$pid}"; }
 function sems_paper($cid, $eid, $pid) {
   // XXX
@@ -107,4 +150,16 @@ function sems_paper($cid, $eid, $pid) {
 
 function get_paper(mysqli $db, $pid) {
   return srow($db, "SELECT * FROM Paper WHERE paper_id=?", array($pid));
+}
+
+function sems_paper_decision_options() {
+  return array(
+    "pending" => "Pending",
+    "full" => "Full",
+    "short" => "Short",
+    "poster" => "Poster",
+    "workshop" => "Workshop",
+    "position" => "Position",
+    "demo" => "Demo",
+    "rejected" => "Rejected");
 }
