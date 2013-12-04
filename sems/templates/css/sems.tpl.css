@@ -1,0 +1,209 @@
+{$colors = [
+  "page_bg" => '#333',
+  "content_bg" => '#E8E4D8',
+  "frame_bg" => '#FFFFFF',
+  "border" => '#959479',
+  
+  "heading_bg" => '#959479',
+  "heading_fg" => '#631111',
+
+  "userbox_bg" => '#343332',
+  "userbox_fg" => '#D6D5C8',
+  "font" => '#333']}
+
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        font-size: 100%;
+        font: inherit;
+        vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+        display: block;
+}
+body {
+        line-height: 1;
+}
+ol, ul {
+        list-style: none;
+}
+blockquote, q {
+        quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+        content: '';
+        content: none;
+}
+table {
+        border-collapse: collapse;
+        border-spacing: 0;
+}
+
+/**
+ * SEMS Style sheet
+ * Author: Philippe Milot (2013)
+ */
+body {
+  font-family: Helvetica, Arial, Sans-Serif;
+  background-color: {$colors.page_bg};
+  color: {$colors.font};
+}
+
+header h1 {
+  font-size: 2em;
+  font-weight: bold;
+  line-height: 3em;
+  vertical-align: middle;
+  text-align: center;
+}
+
+h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  padding: 5px 5px 5px 35px;
+  background-color: {$colors.heading_bg};
+  color: {$colors.heading_fg};
+}
+
+a, a:link, a:visited  {
+  background-color:transparent;
+  color:#996;
+  text-decoration:none;
+  font-weight:bold;
+}
+a:visited  {
+  background-color:transparent;
+  color:#600;
+}
+a:hover { text-decoration:underline; color:#600; }
+
+#body {
+  width: 960px;
+  margin: 0 auto 1em auto;
+  background-color: {$colors.frame_bg};
+  padding: 0 10px 10px 10px;
+  border-radius: 0 0 10px 10px;
+}
+
+header {
+  background-color: {$colors.content_bg};
+  margin: 0;
+  padding: 20px 0 0 20px;
+  height: 7em;
+  border-radius: 0 0 10px 10px;
+  border-bottom: solid 5px {$colors.border};
+  border-left: solid 5px {$colors.border};
+  border-right: solid 5px {$colors.border};
+  border-top: solid 0px auto;
+}
+
+#content {
+  background-color: {$colors.content_bg};
+  min-height: 20em;
+  margin-top: 1em;
+  border-left: solid 1px {$colors.border};
+  border-right: solid 1px {$colors.border};
+}
+
+#content p {
+  margin: 1em 0 1em 0;
+}
+
+#breadcrumb {
+  font-size: 0.8em;
+  margin: 1em 1em 1em 1em;
+}
+#breadcrumb ul li {
+  display: inline-block;
+}
+
+#breadcrumb ul li a:after {
+  content: " > ";
+}
+#breadcrumb ul li:last-child a:after {
+  content: "";
+}
+
+#userbox {
+  background-color: {$colors.userbox_bg};
+  float: right;
+  width: 20%;
+  min-height: 10em;
+  border-radius: 0 0 0 5px;
+  color: {$colors.userbox_fg};
+  margin-left: 1em;
+}
+#userbox a {
+  color: {$colors.userbox_fg};
+  font-weight: normal;
+}
+#userbox .userline {
+  padding: 0.5em 0 0 0.5em;
+  min-height: 1em;
+  position: relative;
+}
+#userbox .user { width: 125px; }
+#userbox .user,
+#userbox .user a {
+  font-weight: bold;
+}
+#userbox .mainaction {
+  position: absolute;
+  right: 0;
+  bottom:0;
+  margin: 1em 0 0 1em;
+  font-size: 0.8em;
+  padding: 0 0.5em 0 0;
+}
+#userbox .separator {
+  border-top: solid 1px {$heading_fg};
+  height: 0px;
+  margin: 0.5em 0.5em 0 0.5em;
+}
+#userbox .action-title {
+  padding: 0.5em 0 0 0.5em;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+#userbox ul {
+  margin: 0.5em 0 0 1em;
+  font-size: 0.8em;
+}
+#userbox li {
+  margin: 0.3em 0 0.3em 0;
+}
+
+#content .content-wrapper {
+  padding: 0 1em 0 1em;
+}
+
+footer {
+  background-color: {$colors.content_bg};
+  border: solid 1px {$colors.border};
+  padding: 1em 1em 1em 1em;
+  font-size: 0.6em;
+  border-radius: 0 0 5px 5px;
+}
+
+

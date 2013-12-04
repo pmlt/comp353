@@ -13,6 +13,9 @@ $HTTP_ROOT = '/comp353';
 function sems_routes() {
   global $HTTP_ROOT;
   return array(
+    //CSS
+    "|^{$HTTP_ROOT}/css/sems.css$|" => 'sems_css',
+
     //User management routes
     "|^{$HTTP_ROOT}/login$|" => 'sems_login',
     "|^{$HTTP_ROOT}/logout$|" => 'sems_logout',
@@ -61,6 +64,8 @@ function sems_routes() {
 }
 
 function sems_root() { global $HTTP_ROOT; return $HTTP_ROOT; }
+
+function sems_css() { return ok(sems_smarty_fetch('css/sems.tpl.css'), array('Content-Type: text/css')); }
 
 function sems_home_url() { return sems_root()."/"; }
 function sems_home() {

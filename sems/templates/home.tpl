@@ -1,7 +1,10 @@
 {extends file='sems_master.tpl'}
 
+{block name='content_title'}
+Welcome to SEMS!
+{/block}
+
 {block name='content'}
-<h2>Welcome to SEMS!</h2>
 
 {if sems_identity_data('email_sent_flag') == "0"}
 <script type="text/javascript">

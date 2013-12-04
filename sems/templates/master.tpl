@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
+<title>{block name='title'}{/block}</title>
 {block name='head'}{/block}
 </head>
 <body>
