@@ -97,3 +97,38 @@ function can_epublish_papers($event, Identity $identity=null) {
   if ('decision' != sems_event_state($event)) return false; // Can only publish after decision is made
   return $event['chair_id'] == $identity->UserId;
 }
+
+/************** UTILITY FUNCTIONS *************/
+
+function sems_actions() {
+  return array_filter(func_get_args());
+}
+
+function sems_action_create_conference() {
+  if (!can_create_conference()) return null;
+  return array(
+    'label' => 'Create a new conference', 
+    'url' => sems_conference_create_url());
+}
+
+function sems_action_edit_conference($conf) {
+  if (!can_edit_conference($conf)) return null;
+  return array(
+    'label' => 'Modify this conference',
+    'url' => sems_conference_edit_url($conf['conference_id']));
+}
+
+function sems_action_create_event($conf) {
+  if (!can_create_event()) return null;
+  return array(
+    'label' => 'Create an event for this conference',
+    'url' => sems_event_create_url($conf['conference_id']));
+}
+
+function sems_action_edit_event($conf, $event) {
+  if (!can_edit_event($event)) return null;
+  return array(
+    'label' => 'Modify this event',
+    'url' => sems_event_edit_url($conf['conference_id'], $event['event_id']));
+}
+

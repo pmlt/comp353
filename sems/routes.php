@@ -81,6 +81,8 @@ function sems_home() {
 
     $vars['breadcrumb'] = sems_breadcrumb(
       sems_bc_home());
+    $vars['actions'] = sems_actions(
+      sems_action_create_conference());
     return ok(sems_smarty_fetch('home.tpl', $vars));
   });
 }

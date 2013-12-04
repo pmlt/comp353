@@ -10,10 +10,10 @@
   {/if}
   </div>
   <div class="separator">&nbsp;</div>
-  {if $user_actions}
+  {if $actions}
   <div class='action-title'>On this page...</div>
   <ul>
-    {foreach $user_actions as $action}
+    {foreach $actions as $action}
     <li><a href="{$action.url}">{$action.label}</a></li>
     {/foreach}
   </ul>

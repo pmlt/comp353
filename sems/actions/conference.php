@@ -14,12 +14,9 @@ function sems_conference($cid) {
     $vars['chair'] = $chair;
     
     //Possible actions
-    $actions = array(
-      array(
-        'url' => sems_conference_edit_url($cid),
-        'label' => 'Modify this conference',
-        'permission' => array('role', 'admin')));
-    $vars['actions'] = sems_identity_actions(sems_get_identity(), $actions);
+    $vars['actions'] = sems_actions(
+      sems_action_edit_conference($conf),
+      sems_action_create_event($conf));
 
     //Get the list of topics for this conference
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "ConferenceTopic", "conference_id", $cid));
@@ -118,9 +115,3 @@ function get_conference(mysqli $db, $cid) {
   return srow($db, "SELECT * FROM Conference WHERE conference_id=?", array($cid));
 }
 
-function conference_actions($cid) {
-  return array(
-    'conference' => array(
-      'edit' => array(
-        'Modify this conference' => sems_conference_edit_url($cid))));
-}
