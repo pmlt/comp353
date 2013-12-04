@@ -1,9 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="conference/master.tpl"}
 
-{block name='title'}{$conf.name}{/block}
+{block name='content_title'}Modify details for {$conf.name}{/block}
 {block name='content'}
-
-<h2>Edit this conference</h2>
 
 {include file="conference/form.tpl" data=array_merge($conf, $smarty.post)}
 

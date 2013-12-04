@@ -1,8 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="conference/master.tpl"}
 
+{block name='content_title'}Create a new conference{/block}
 {block name='content'}
-
-<h2>Create a new conference</h2>
 
 {include file="conference/form.tpl" data=$smarty.post}
 

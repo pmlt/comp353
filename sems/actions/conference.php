@@ -26,13 +26,11 @@ function sems_conference($cid) {
 
     //Get the list of events for this conference
     $vars['events'] = stable($db, "SELECT event_id, title, description, start_date FROM Event WHERE conference_id=? ORDER BY start_date", array($cid));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf));
     return ok(sems_smarty_fetch('conference/index.tpl', $vars));
   });
-}
-
-function sems_conference_search($conf) {
-  // XXX check if conference exists.
-  return sems_notfound();
 }
 
 function sems_conference_create_url() { return SEMS_ROOT.'/create'; }
@@ -63,6 +61,9 @@ function sems_conference_create() {
       }
     }
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_topics($db));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc('Create a new conference', sems_conference_create_url()));
     return ok(sems_smarty_fetch('conference/create.tpl', $vars));
   });
 }
@@ -105,6 +106,10 @@ function sems_conference_edit($cid) {
       }
     }
     $vars['hierarchy'] = sems_topic_hierarchy(sems_select_topics(sems_fetch_topics($db), sems_fetch_topic_selection($db, 'ConferenceTopic', 'conference_id', $cid)));
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc('Modify details', sems_conference_edit_url($cid)));
     return ok(sems_smarty_fetch('conference/edit.tpl', $vars));
   });
 }

@@ -39,7 +39,13 @@ function sems_bc($label, $url) {
 
 function sems_bc_home() { return sems_bc('SEMS Home', sems_home_url()); }
 
-function sems_bc_profile(Identity $ident) { return sems_bc($ident->fullname(), sems_profile_url($ident->UserId)); }
+function sems_bc_profile(Identity $ident) {
+  return sems_bc($ident->fullname(), sems_profile_url($ident->UserId));
+}
+
+function sems_bc_conference($conf) {
+  return sems_bc($conf['name'], sems_conference_url($conf['conference_id']));
+}
 
 
 /********** USER SELECTION *************/

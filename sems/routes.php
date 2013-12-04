@@ -27,7 +27,6 @@ function sems_routes() {
     //Conference routes
     "|^{$HTTP_ROOT}/create$|" => 'sems_conference_create',
     "|^{$HTTP_ROOT}/(\w+)$|" => 'sems_conference',
-    "|^{$HTTP_ROOT}/(\w+)/search$|" => 'sems_conference_search',
     "|^{$HTTP_ROOT}/(\w+)/edit$|" => 'sems_conference_edit',
     
     //Event routes

@@ -1,6 +1,6 @@
-{extends file="sems_master.tpl"}
+{extends file="conference/master.tpl"}
 
-{block name='title'}{$conf.name}{/block}
+{block name='content_title'}Welcome!{/block}
 {block name='content'}
 
 <p>{$conf.description}</p>
@@ -12,6 +12,11 @@
 <p>Scheduled events in this conference:</p>
 
 <table>
+<tr>
+  <th>Event name</th>
+  <th>Description</th>
+  <th>Date</th>
+</tr>
 {foreach $events as $e}
 <tr>
   <td><a href="{sems_event_url($conf.conference_id,$e.event_id)}">{$e.title}</a></td><td>{$e.description}</td><td>{sems_datetime($e.start_date)}</td>

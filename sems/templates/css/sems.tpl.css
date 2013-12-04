@@ -208,6 +208,7 @@ header {
 }
 
 #content strong { font-weight: bold; }
+#content th { font-weight: bold; }
 
 #content table td {
   padding: 0.3em 0 0 0.3em;
