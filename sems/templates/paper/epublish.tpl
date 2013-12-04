@@ -22,7 +22,7 @@ $(function() {
 {/foreach}
 
 <p><input type="submit" value="Save dates" /></p>
-{if $saved}<p class="success">Decisions saved. You can change your mind until {sems_datetime($event.decision_date)}.</p>{/if}
+{if $saved}<p class="success">Publication dates saved.</p>{/if}
 </form>
 
 
