@@ -10,7 +10,7 @@
 {/block}
 
 {block name='body'}
-<div id="body">
+<div id="main-body">
 
 {block name='header'}
 <header>

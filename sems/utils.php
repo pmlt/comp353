@@ -51,6 +51,10 @@ function sems_bc_event($conf, $event) {
   return sems_bc($event['title'], sems_event_url($conf['conference_id'], $event['event_id']));
 }
 
+function sems_bc_message($conf, $event, $message) {
+  return sems_bc($message['title'], sems_message_url($conf['conference_id'], $event['event_id'], $message['message_id']));
+}
+
 
 /********** USER SELECTION *************/
 

@@ -1,10 +1,5 @@
 <?php
 
-function sems_messages_url($cid, $eid) { return sems_event_url($cid, $eid)."/messages"; }
-function sems_messages($cid, $eid) {
-  // XXX
-}
-
 function sems_message_url($cid, $eid, $mid) { return sems_messages_url($cid, $eid)."/{$mid}"; }
 function sems_message($cid, $eid, $mid) {
   return sems_db(function($db) use($cid, $eid, $mid) {
@@ -24,17 +19,27 @@ function sems_message($cid, $eid, $mid) {
       'conf' => $conf,
       'event' => $event,
       'message' => $message,
-      'author' => $author);
+      'author' => $author, 
+      'breadcrumb' => sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event),
+        sems_bc_message($conf, $event, $message)),
+      'actions' => array_merge(
+        sems_event_actions($conf, $event), 
+        sems_actions(
+          sems_action_edit_message($conf, $event, $message))));
     return ok(sems_smarty_fetch('message/details.tpl', $vars));
   });
 }
 
-
+function sems_messages_url($cid, $eid) { return sems_event_url($cid, $eid)."/messages"; }
 function sems_messages_create_url($cid, $eid) { return sems_messages_url($cid, $eid)."/create"; }
 function sems_messages_create($cid, $eid) {
   return sems_db(function($db) use($cid, $eid) {
+    $conf = get_conference($db, $cid);
     $event = get_event($db, $cid, $eid);
-    if (!$event) return sems_notfound();
+    if (!$conf || !$event) return sems_notfound();
 
     // Check that this user can create a new message
     if (!can_post_message($event)) {
@@ -42,7 +47,7 @@ function sems_messages_create($cid, $eid) {
     }
 
     $vars = array();
-    $vars['conf'] = get_conference($db, $cid);
+    $vars['conf'] = $conf;
     $vars['event'] = $event;
     if (count($_POST) > 0) {
       $rules = array(
@@ -70,6 +75,12 @@ function sems_messages_create($cid, $eid) {
         $vars['errors'] = $errors;
       }
     }
+    $vars['breadcrumb'] = sems_breadcrumb(
+      sems_bc_home(),
+      sems_bc_conference($conf),
+      sems_bc_event($conf, $event),
+      sems_bc('Post a new message', sems_messages_create_url($cid, $eid)));
+    $vars['actions'] = sems_event_actions($conf, $event);
     return ok(sems_smarty_fetch('message/create.tpl', $vars));
   });
 }
@@ -77,18 +88,17 @@ function sems_messages_create($cid, $eid) {
 function sems_message_edit_url($cid, $eid, $mid) { return sems_message_url($cid, $eid, $mid)."/edit"; }
 function sems_message_edit($cid, $eid, $mid) {
   return sems_db(function($db) use($cid, $eid, $mid) {
+    $conf = get_conference($db, $cid);
     $event = get_event($db, $cid, $eid);
-    if (!$event) return sems_notfound();
-
     $message = get_message($db, $mid);
-    if (!$message) return sems_notfound();
+    if (!$conf && !$event && !$message) return sems_notfound();
 
     if (!can_edit_message($event, $message)) {
       return sems_forbidden("You may not edit this message's details.");
     }
 
     $vars = array();
-    $vars['conf'] = get_conference($db, $cid);
+    $vars['conf'] = $conf;
     $vars['event'] = $event;
     $vars['message'] = $message;
     if (count($_POST) > 0) {
@@ -113,6 +123,13 @@ function sems_message_edit($cid, $eid, $mid) {
         $vars['errors'] = $errors;
       }
     }
+    $vars['breadcrumb'] = sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event),
+        sems_bc_message($conf, $event, $message),
+        sems_bc('Modify details', sems_message_edit_url($cid, $eid, $mid)));
+    $vars['actions'] = sems_event_actions($conf, $event);
     return ok(sems_smarty_fetch('message/edit.tpl', $vars));
   });
 }

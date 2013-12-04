@@ -51,7 +51,6 @@ function sems_routes() {
 
     //Message routes
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/messages/create$|" => 'sems_messages_create',
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/messages$|" => 'sems_messages',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/messages/(\w+)$|" => 'sems_message',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/messages/(\w+)/edit$|" => 'sems_message_edit',
     

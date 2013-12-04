@@ -1,9 +1,9 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
-{block name='title'}{$conf.name}{/block}
+{block name='content_title'}{$message.title}{/block}
 {block name='content'}
-<h2>{$message.title}</h2>
-<p>By {$author->fullname()}</p>
+<p>Published on {sems_datetime($message.publish_date)}</p>
+<p>By <a href="{sems_profile_url($author->UserId)}">{$author->fullname()}</a></p>
 
 {$message.body}
 {/block}

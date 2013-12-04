@@ -57,12 +57,12 @@ function get_message_conditions($event, $committee, $identity=null) {
 
 function can_post_message($event, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
-  return $event['chair_id'] != $identity->UserId;
+  return $event['chair_id'] == $identity->UserId;
 }
 
 function can_edit_message($event, $message, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
-  return $event['chair_id'] != $identity->UserId;
+  return $event['chair_id'] == $identity->UserId;
 }
 
 function can_bid_for_papers($event, $committee, Identity $identity=null) {
@@ -147,7 +147,6 @@ function sems_action_submit_paper($conf, $event) {
 }
 
 function sems_action_post_message($conf, $event) {
-
   if (!can_post_message($event)) return null;
   return array(
     'label' => 'Post a new message',
@@ -194,6 +193,6 @@ function sems_action_edit_message($conf, $event, $message) {
   if (!can_edit_message($event, $message)) return null;
   return array(
     'label' => 'Modify this message',
-    'url' => sems_message_edit_url($conf['conference_id'], $event['event_id']));
+    'url' => sems_message_edit_url($conf['conference_id'], $event['event_id'], $message['message_id']));
 }
 

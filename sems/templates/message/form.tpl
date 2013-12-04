@@ -38,3 +38,4 @@ $(function() {
     <td colspan="3"><input type="submit" value="Submit" /></td>
   </tr>
 </table>
+</form>
