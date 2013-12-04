@@ -4,11 +4,11 @@
 
 <p>{$event.description}</p>
 
+<h3>Program chair</h3>
+<p><a href="{sems_profile_url($chair->UserId)}">{$chair->fullname()}</a></p>
+
 <h3>Topics of interest</h3>
 {include file="ui/topic_hierarchy.tpl"}
-
-<h3>Program chair</h3>
-<p>{$chair->fullname()}</p>
 
 <h3>Current status</h3>
 <p>{sems_event_state_str(sems_event_state($event))}</p>

@@ -5,11 +5,13 @@
 
 <p>{$conf.description}</p>
 
-<p>Topics of interest are: {include file="ui/topic_hierarchy.tpl"}</p>
+<h3>Conference chair</h3>
+<a href="{sems_profile_url($chair->UserId)}">{$chair->fullname()}</a>
 
-<p>Conference chair: <a href="{sems_profile_url($chair->UserId)}">{$chair->fullname()}</a></p>
+<h3>Topics of interest</h3>
+{include file="ui/topic_hierarchy.tpl"}
 
-<p>Scheduled events in this conference:</p>
+<h3>Scheduled events</h3>
 
 <table>
 <tr>
