@@ -29,6 +29,10 @@ function http_request_uri() {
   return $_SERVER['REQUEST_URI'];
 }
 
+function http_referrer() {
+  return $_SERVER['HTTP_REFERER'];
+}
+
 function http_route($url, array $routes) {
   try {
     $match = http_match($url, $routes);

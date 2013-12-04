@@ -16,7 +16,8 @@ function sems_login() {
       if ($user_id > 0) {
         //Login successful.
         sems_set_identity(sems_create_identity($db, $user_id));
-        return found(sems_home_url());
+        $lp = $_SESSION['last_page'];
+        return found($lp ? $lp : sems_home_url());
       }
       return null;
     });
@@ -26,13 +27,18 @@ function sems_login() {
   $smarty_vars['breadcrumb'] = sems_breadcrumb(
     sems_bc_home(),
     sems_bc('Sign-in', sems_login_url()));
+
+  //Save referrer for future login success
+  $r = http_referrer();
+  if ($r != sems_login_url()) $_SESSION['last_page'] = $r;
   return ok(sems_smarty_fetch('user/login.tpl', $smarty_vars));
 }
 
 function sems_logout_url() { return SEMS_ROOT.'/logout'; }
 function sems_logout() {
   sems_clear_identity();
-  return found(sems_home_url());
+  $r = http_referrer();
+  return found($r ? $r : sems_home_url());
 }
 
 function sems_signup_url() { return SEMS_ROOT.'/signup'; }
