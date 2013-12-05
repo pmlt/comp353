@@ -60,7 +60,7 @@ function sems_bc_paper($conf, $event, $paper) {
 }
 
 function sems_bc_review($conf, $event, $paper, $review) {
-  return sems_bc($paper['title'], sems_review_url($conf['conference_id'], $event['event_id'], $review['review_id']));
+  return sems_bc('Review of ' . $paper['title'], sems_review_url($conf['conference_id'], $event['event_id'], $review['review_id']));
 }
 
 

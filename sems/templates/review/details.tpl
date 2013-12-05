@@ -1,9 +1,7 @@
 {extends file="sems_master.tpl"}
 
-{block name='title'}{$conf.name}{/block}
+{block name='content_title' append=true} - Review of {$paper.title}{/block}
 {block name='content'}
-<h2>Review of {$paper.title}</h2>
-
 <h3>Paper details</h3>
 {include file="paper/file.tpl"}
 

@@ -1,9 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
-{block name='title'}{$conf.title}{/block}
+{block name='content_title' append=true} - Paper Review Assignment{/block}
 {block name='content'}
-<h2>Paper Review Assignment for {$event.title}</h2>
-
 <form method="post">
 
 <h3>Assignments</h3>
@@ -15,7 +13,7 @@
 </tr>
 {foreach $reviews as $review}
 <tr>
-  <td><a href="{sems_review_url($conf.conference_id,$event.event_id,$review.review_id)}">{$review.title}</a></td>
+  <td><a href="{sems_paper_url($conf.conference_id,$event.event_id,$review.paper_id)}">{$review.title}</a></td>
   <td>{$review.reviewer}</td>
   <td><button name="revoke" value="{$review.review_id}">Revoke</button></td>
 </tr>

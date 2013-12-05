@@ -1,9 +1,7 @@
-{extends file="sems_master.tpl"}
+{extends file="event/master.tpl"}
 
-{block name='title'}{$conf.title}{/block}
+{block name='content_title' append=true} - Paper Review Auction{/block}
 {block name='content'}
-<h2>Paper Review Auction for {$event.title}</h2>
-
 <form method="post">
 <table>
 <tr>
@@ -15,7 +13,7 @@
 </tr>
 {foreach $papers as $paper}
 <tr>
-  <td>{$paper.title}</td>
+  <td><a href="{sems_paper_url($conf.conference_id, $event.event_id, $paper.paper_id)}">{$paper.title}</a></td>
   <td>{$paper.author}</td>
   <td>{$paper.keywords}</td>
   <td><a href="{sems_paper_download_url($paper.paper_id,$paper.revision_date)}">Download</a></td>

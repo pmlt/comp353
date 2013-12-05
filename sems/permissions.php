@@ -83,7 +83,7 @@ function can_assign_paper_reviews($event, Identity $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   $state = sems_event_state($event);
   // Can only assign papers during specific periods
-  if ($state != 'auction' && $state != 'auction_ended' && $state != 'review') return false;
+  if ($state != 'auction_ended' && $state != 'review') return false;
   return $event['chair_id'] == $identity->UserId;
 }
 

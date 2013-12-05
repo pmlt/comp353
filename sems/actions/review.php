@@ -58,7 +58,13 @@ function sems_review($cid, $eid, $rid) {
       'revisions' => $revisions,
       'review' => $review,
       'errors' => $errors,
-      'saved' => $saved);
+      'saved' => $saved,
+      'breadcrumb' => sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event), 
+        sems_bc_review($conf, $event, $paper, $review)),
+      'actions' => sems_event_actions($conf, $event));
     return ok(sems_smarty_fetch('review/details.tpl', $vars));
   });
 }
@@ -103,10 +109,16 @@ function sems_reviews_auction ($cid, $eid) {
     }
     $vars = array(
       'conf' => $conf,
-      'event' => $conf,
+      'event' => $event,
       'papers' => $papers,
       'bids' => $bids,
-      'saved' => $saved);
+      'saved' => $saved,
+      'breadcrumb' => sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event),
+        sems_bc('Paper Review Auction', sems_reviews_auction_url($cid, $eid))),
+      'actions' => sems_event_actions($conf, $event));
     return ok(sems_smarty_fetch('review/auction.tpl', $vars));
   });
 }
@@ -144,7 +156,13 @@ function sems_reviews_assign($cid, $eid) {
       'conf' => $conf,
       'event' => $event,
       'reviews' => $reviews,
-      'bids' => $bids);
+      'bids' => $bids,
+      'breadcrumb' => sems_breadcrumb(
+        sems_bc_home(),
+        sems_bc_conference($conf),
+        sems_bc_event($conf, $event),
+        sems_bc('Paper Review Assignment', sems_reviews_assign_url($cid, $eid))),
+      'actions' => sems_event_actions($conf, $event));
     return ok(sems_smarty_fetch('review/assign.tpl', $vars));
   });
 }
