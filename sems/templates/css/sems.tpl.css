@@ -94,7 +94,7 @@ a, a:link, a:visited  {
   background-color:transparent;
   color:#996;
   text-decoration:none;
-  font-weight:bold;
+  font-weight:normal;
 }
 a:visited  {
   background-color:transparent;
@@ -148,6 +148,7 @@ header {
 #breadcrumb ul li:last-child a:after {
   content: "";
 }
+#breadcrumb ul li a { font-weight: bold; }
 
 #userbox {
   background-color: {$colors.userbox_bg};
@@ -210,6 +211,7 @@ header {
 #content strong { font-weight: bold; }
 #content th { font-weight: bold; }
 #content h3 { font-weight: bold; font-size: 1.2em; color: {$colors.heading_fg}; }
+#content h4 { font-weight: bold; color: {$colors.heading_fg}; }
 
 #content table td {
   padding: 0.3em 0 0 0.3em;
@@ -226,6 +228,36 @@ header {
   min-width: 250px;
   min-height: 100px;
 }
+
+#content .three-columns-layout {
+  clear: both;
+  width: 100%;
+}
+
+#content .three-columns-layout .col {
+  float: left;
+  width: 30%;
+  padding: 0px 5px 0px 5px;
+  /* border-right: solid 1px {$colors.border}; */
+}
+
+#content .three-columns-layout + * {
+  clear: both;
+}
+
+#content dl dt { font-weight: bold; margin: 0.5em 0 0.5em 0; }
+#content dl dt a { font-weight: bold; color: {$colors.font}; }
+#content dl dd { margin: 0.5em 0 1em 0.5em; }
+#content dl dd a { font-weight: normal; }
+#content .datetime { font-weight: bold; font-size: 0.7em; }
+#content .readmore { font-size: 0.7em; }
+
+/*
+#content .three-columns-layout .col:last-child {
+  border-right: solid 0px {$colors.border};
+
+}
+*/
 
 footer {
   border-top: solid 1px {$colors.border};

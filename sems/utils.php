@@ -8,7 +8,9 @@ function sems_time() {
 
 function sems_datetime($date) {
   $time = strtotime($date);
-  return date('j F Y', $time) . ' at ' . date('H:i', $time);
+  $datepart = date('j F Y', $time);
+  $timepart = date('H:i', $time);
+  return $datepart . ($timepart == '00:00' ? "" : ' at ' . $timepart);
 }
 
 function sems_paper_download_url($paper_id, $revision) {

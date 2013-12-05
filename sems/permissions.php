@@ -32,9 +32,24 @@ function can_submit_papers($event, $identity=null) {
   return $event['chair_id'] != $identity->UserId;
 }
 
-function can_view_private_messages($event, $committee, $identity=null) {
+function can_view_paper($event, $paper, $committee, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
-  return in_array($identity->UserId, $committee);
+  if ($event['chair_id'] == $identity->UserId) return true; //Chair can always view
+  if (in_array($identity->UserId, $committee)) return true; //Committee members can always view
+  if (sems_time() < strtotime($message['publish_date'])) return false; //Can't view unpublished papers
+  return true;
+}
+
+function get_paper_conditions($event, $committee, $identity=null) {
+  if (!$identity) $identity = sems_get_identity();
+  $must_belong_to_event = qeq('event_id', $event['event_id']);
+  $must_be_published = qcond('<=', 'publish_date', date('Y-m-d H:i:s', sems_time()));
+  if (in_array($identity->UserId, $committee)) {
+    return $must_belong_to_event;
+  }
+  else {
+    return qand(array($must_belong_to_event, $must_be_published));
+  }
 }
 
 function can_view_message($event, $message, $committee, $identity=null) {
@@ -42,14 +57,6 @@ function can_view_message($event, $message, $committee, $identity=null) {
   if ($event['chair_id'] == $identity->UserId) return true; //Chair can always view
   if (sems_time() < strtotime($message['publish_date'])) return false; //Can't view future messages
   if (!$message['is_public']) return in_array($identity->UserId, $committee);
-  return true;
-}
-
-function can_view_paper($event, $paper, $committee, $identity=null) {
-  if (!$identity) $identity = sems_get_identity();
-  if ($event['chair_id'] == $identity->UserId) return true; //Chair can always view
-  if (in_array($identity->UserId, $committee)) return true; //Committee members can always view
-  if (sems_time() < strtotime($message['publish_date'])) return false; //Can't view unpublished papers
   return true;
 }
 
@@ -92,6 +99,13 @@ function can_review_paper($event, $review, Identity $identity=null) {
   if ('review' != sems_event_state($event)) return false; // Can only review in the right period
   if ($identity->UserId <= 0) return false;
   return $review['reviewer_id'] == $identity->UserId || $review['external_reviewer_id'] == $identity->UserId;
+}
+
+function get_review_conditions($event, $committee, $identity=null) {
+  if (!$identity) $identity = sems_get_identity();
+  $must_belong_to_event = qeq('event_id', $event['event_id']);
+  $must_be_assigned = qeq('PaperReview.reviewer_id', $identity->UserId);
+  return qand(array($must_belong_to_event, $must_be_assigned));
 }
 
 function can_accept_papers($event, Identity $identity=null) {

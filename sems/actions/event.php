@@ -17,6 +17,9 @@ function sems_event($cid, $eid) {
     $chair = sems_create_identity($db, $event['chair_id']);
     $vars['chair'] = $chair;
 
+    //Get the whole event committee
+    $vars['committee'] = get_event_committee($db, $eid);
+
     //Get the list of topics for this event
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "EventTopic", "event_id", $eid));
 
@@ -24,6 +27,14 @@ function sems_event($cid, $eid) {
     $committee = get_event_committee_ids($db, $eid);
     $where = get_message_conditions($event, $committee);
     $vars['messages'] = stable($db, "SELECT * FROM Message WHERE ".$where->sql." ORDER BY publish_date DESC", $where->params);
+
+    //Get the list of papers for this event
+    $where = get_paper_conditions($event, $committee);
+    $vars['papers'] = stable($db, "SELECT paper_id, User.user_id, Paper.title, User.title AS user_title, first_name, last_name FROM Paper,User WHERE Paper.submitter_id=User.user_id AND ".$where->sql." ORDER BY publish_date DESC", $where->params);
+
+    //Get the list of personal reviews for this event
+    $where = get_review_conditions($event, $committee);
+    $vars['reviews'] = stable($db, "SELECT review_id, Paper.title, score FROM PaperReview,Paper,User WHERE PaperReview.paper_id=Paper.paper_id AND PaperReview.reviewer_id=User.user_id AND " . $where->sql." ORDER BY PaperReview.score", $where->params);
 
     $vars['breadcrumb'] = sems_breadcrumb(
       sems_bc_home(),
@@ -225,7 +236,7 @@ function get_event(mysqli $db, $cid, $eid) {
 }
 
 function get_event_committee(mysqli $db, $eid) {
-  return stable($db, "SELECT User.user_id, User.email FROM User,CommitteeMembership AS ec WHERE ec.user_id=User.user_id AND ec.event_id=?", array($eid));
+  return stable($db, "SELECT User.user_id, User.first_name, User.last_name, User.email FROM User,CommitteeMembership AS ec WHERE ec.user_id=User.user_id AND ec.event_id=?", array($eid));
 }
 
 function get_event_committee_ids(mysqli $db, $eid) {
@@ -246,6 +257,19 @@ $event_states = array(
   'meet' => 'Currently underway.',
   'ended' => 'Event over. Thank you for coming!');
 
+$event_state_names = array(
+  'init' => 'Initial preparations',
+  'term' => 'Term period',
+  'term_ended' => 'End of term period',
+  'submit' => 'Paper submission period',
+  'submit_ended' => 'End of paper submission period',
+  'auction' => 'Paper review auction period',
+  'auction_ended' => 'End of paper review auction period',
+  'review' => 'Paper review period',
+  'review_ended' => 'Decision period',
+  'decision' => 'Announcement of paper decisions',
+  'meet' => 'Meeting period',
+  'ended' => 'Event is over');
 function sems_event_state($event) {
   $time = sems_time();
   if ($time < strtotime($event['term_start_date'])) return 'init';
@@ -265,6 +289,11 @@ function sems_event_state($event) {
 function sems_event_state_str($state) {
   global $event_states;
   return $event_states[$state];
+}
+
+function sems_event_state_name_str($state) {
+  global $event_state_names;
+  return $event_state_names[$state];
 }
 
 function sems_event_actions($conf, $event, $committee) {
