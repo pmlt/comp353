@@ -477,6 +477,31 @@ INSERT INTO `PaperReview` VALUES
 
 INSERT INTO `Message` VALUES
 (1, 1, 2, '2014-01-02 00:00:00', b'1', 'Submissions are open!', 'Hi, this is Jerry.  This is just to...', 'Hi, this is Jerry. This is just to let you know that the event is officially open for paper submissions.'),
-(2, 1, 2, '2014-01-06 00:00:00', b'1', 'Decisions are in!', 'Jerry again. The paper...', 'Jerry again. The final decisions for all submitted papers is now public. Congratulations to those who made it!');
+(2, 1, 2, '2014-01-06 00:00:00', b'1', 'Decisions are in!', 'Jerry again. The paper...', 'Jerry again. The final decisions for all submitted papers is now public. Congratulations to those who made it!'),
+(3, 3, 7, '2013-12-01 00:00:00', b'1', 'Submissions are open!', 'Users can now...', 'Users can now submit papers for this event. Looking forward to reading your work!'),
+(4, 3, 7, '2013-12-02 00:00:00', b'1', 'No longer accepting submissions.', 'The paper sub...', 'The paper submission form is now closed for this event. Thanks to all those who sent a paper our way!'),
+(5, 3, 7, '2013-12-02 00:00:00', b'0', 'Auctions start now', 'Committee members, please go...', 'Committee members, please go to the auction panel and indicate which paper you would like to review. Thanks!'),
+(6, 3, 7, '2013-12-03 00:00:00', b'0', 'Reviews are now assigned!', 'Committee members, please start...', 'Committee members, please start writing your reviews now. Thanks!'),
+(7, 3, 7, '2013-12-05 00:00:00', b'1', 'The results are in!', 'We have made the final...', 'We have made the final selection for the papers that will be published in this issue. Congratulations to all who were selected! You can consult the event homepage to see if your paper was selected.'),
+(8, 3, 7, '2013-12-06 11:00:00', b'1', 'Issue No. 1 is out!', 'All papers have been published...', 'All papers have been published! You can read them from the event homepage.'),
+(9, 4, 7, '2013-12-02 00:00:00', b'1', 'Submissions are open!', 'Users can now...', 'Users can now submit papers for this event. Looking forward to reading your work!'),
+(10, 4, 7, '2013-12-03 00:00:00', b'1', 'No longer accepting submissions.', 'The paper sub...', 'The paper submission form is now closed for this event. Thanks to all those who sent a paper our way!'),
+(11, 4, 7, '2013-12-03 00:00:00', b'0', 'Auctions start now', 'Committee members, please go...', 'Committee members, please go to the auction panel and indicate which paper you would like to review. Thanks!'),
+(12, 4, 7, '2013-12-04 00:00:00', b'0', 'Reviews are now assigned!', 'Committee members, please start...', 'Committee members, please start writing your reviews now. Thanks!'),
+(13, 4, 7, '2013-12-06 00:00:00', b'1', 'The results are in!', 'We have made the final...', 'We have made the final selection for the papers that will be published in this issue. Congratulations to all who were selected! You can consult the event homepage to see if your paper was selected.'),
+(14, 4, 7, '2013-12-07 11:00:00', b'1', 'Issue No. 2 is out!', 'All papers have been published...', 'All papers have been published! You can read them from the event homepage.'),
+(15, 5, 7, '2013-12-03 00:00:00', b'1', 'Submissions are open!', 'Users can now...', 'Users can now submit papers for this event. Looking forward to reading your work!'),
+(16, 5, 7, '2013-12-04 00:00:00', b'1', 'No longer accepting submissions.', 'The paper sub...', 'The paper submission form is now closed for this event. Thanks to all those who sent a paper our way!'),
+(17, 5, 7, '2013-12-04 00:00:00', b'0', 'Auctions start now', 'Committee members, please go...', 'Committee members, please go to the auction panel and indicate which paper you would like to review. Thanks!'),
+(18, 5, 7, '2013-12-05 00:00:00', b'0', 'Reviews are now assigned!', 'Committee members, please start...', 'Committee members, please start writing your reviews now. Thanks!'),
+(19, 6, 7, '2013-12-04 00:00:00', b'1', 'Submissions are open!', 'Users can now...', 'Users can now submit papers for this event. Looking forward to reading your work!'),
+(20, 6, 7, '2013-12-05 00:00:00', b'1', 'No longer accepting submissions.', 'The paper sub...', 'The paper submission form is now closed for this event. Thanks to all those who sent a paper our way!'),
+(21, 6, 7, '2013-12-05 00:00:00', b'0', 'Auctions start now', 'Committee members, please go...', 'Committee members, please go to the auction panel and indicate which paper you would like to review. Thanks!'),
+(22, 6, 7, '2013-12-06 00:00:00', b'0', 'Reviews are now assigned!', 'Committee members, please start...', 'Committee members, please start writing your reviews now. Thanks!'),
+(23, 7, 7, '2013-12-05 00:00:00', b'1', 'Submissions are open!', 'Users can now...', 'Users can now submit papers for this event. Looking forward to reading your work!'),
+(24, 7, 7, '2013-12-06 00:00:00', b'1', 'No longer accepting submissions.', 'The paper sub...', 'The paper submission form is now closed for this event. Thanks to all those who sent a paper our way!'),
+(25, 7, 7, '2013-12-06 00:00:00', b'0', 'Auctions start now', 'Committee members, please go...', 'Committee members, please go to the auction panel and indicate which paper you would like to review. Thanks!'),
+(26, 8, 7, '2013-12-06 00:00:00', b'1', 'Submissions are open!', 'Users can now...', 'Users can now submit papers for this event. Looking forward to reading your work!');
+
 
 

@@ -64,7 +64,7 @@
 
       <dt>{sems_event_state_name_str('review')}</dt>
       <dd><span class="datetime">
-        {sems_datetime($event.review_start_date)} tp
+        {sems_datetime($event.review_start_date)} to
         {sems_datetime($event.review_end_date)}</span></dd>
 
       <dt>{sems_event_state_name_str('decision')}</dt>

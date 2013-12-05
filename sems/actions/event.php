@@ -26,7 +26,7 @@ function sems_event($cid, $eid) {
     //Get the list of messages for this event
     $committee = get_event_committee_ids($db, $eid);
     $where = get_message_conditions($event, $committee);
-    $vars['messages'] = stable($db, "SELECT * FROM Message WHERE ".$where->sql." ORDER BY publish_date DESC", $where->params);
+    $vars['messages'] = stable($db, "SELECT * FROM Message WHERE ".$where->sql." ORDER BY publish_date DESC LIMIT 8", $where->params);
 
     //Get the list of papers for this event
     $where = get_paper_conditions($event, $committee);
