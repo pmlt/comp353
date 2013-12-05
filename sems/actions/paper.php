@@ -2,9 +2,6 @@
 
 
 function sems_papers_url($cid, $eid) { return sems_event_url($cid, $eid)."/papers"; }
-function sems_papers($cid, $eid) {
-  // XXX
-}
 
 function sems_papers_submit_url($cid, $eid) { return sems_papers_url($cid,$eid)."/submit"; }
 function sems_papers_submit($cid, $eid) {

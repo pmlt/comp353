@@ -1,9 +1,6 @@
 <?php
 
 function sems_reviews_url($cid, $eid) { return sems_event_url($cid, $eid)."/reviews"; }
-function sems_reviews($cid, $eid) {
-  // XXX
-}
 
 function sems_review_url($cid, $eid, $rid) { return sems_reviews_url($cid, $eid)."/{$rid}"; }
 function sems_review($cid, $eid, $rid) {

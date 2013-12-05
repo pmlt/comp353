@@ -37,14 +37,12 @@ function sems_routes() {
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/edit$|" => 'sems_event_edit',
 
     //Paper routes
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers$|" => 'sems_papers',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/submit$|" => 'sems_papers_submit',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/decision$|" => 'sems_papers_decision',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/epublish$|" => 'sems_papers_epublish',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/papers/(\w+)$|" => 'sems_paper',
 
     //Review routes
-    "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews$|" => 'sems_reviews',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/auction$|" => 'sems_reviews_auction',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/assign$|" => 'sems_reviews_assign',
     "|^{$HTTP_ROOT}/(\w+)/(\w+)/reviews/(\w+)$|" => 'sems_review',
