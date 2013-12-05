@@ -17,7 +17,10 @@ function sems_conference($cid) {
     $vars['hierarchy'] = sems_topic_hierarchy(sems_fetch_linked_topics($db, "ConferenceTopic", "conference_id", $cid));
 
     //Get the list of events for this conference
-    $vars['events'] = stable($db, "SELECT event_id, title, description, start_date FROM Event WHERE conference_id=? ORDER BY start_date", array($cid));
+    $vars['events'] = stable($db, "SELECT event_id, title, description, start_date, end_date FROM Event WHERE conference_id=? ORDER BY start_date", array($cid));
+
+    //Get all public messages for this conference
+    $vars['messages'] = stable($db, "SELECT message_id, Event.event_id, Message.title, excerpt, publish_date FROM Message,Event WHERE Message.event_id=Event.event_id AND Event.conference_id=? AND is_public='1' AND publish_date <= ?", array($cid, date('Y-m-d H:i:s', sems_time())));
 
     $vars['breadcrumb'] = sems_breadcrumb(
       sems_bc_home(),

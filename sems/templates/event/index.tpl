@@ -9,12 +9,7 @@
   <div class="col">
   <h3>In the news...</h3>
 
-    <dl>
-    {foreach $messages as $message}
-    <dt><a href="{sems_message_url($conf.conference_id, $event.event_id, $message.message_id)}">{$message.title}</a></dt>
-    <dd><span class="datetime">{sems_datetime($message.publish_date)}</span> {$message.excerpt} <a class="readmore" href="{sems_message_url($conf.conference_id, $event.event_id, $message.message_id)}">[Read more]</a></dd>
-    {/foreach}
-    </dl>
+    {include file="message/listing.tpl"}
 
   </div>
   <div class="col">

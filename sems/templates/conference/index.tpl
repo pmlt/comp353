@@ -5,26 +5,39 @@
 
 <p>{$conf.description}</p>
 
-<h3>Conference chair</h3>
-<a href="{sems_profile_url($chair->UserId)}">{$chair->fullname()}</a>
+<div class="three-columns-layout">
 
-<h3>Topics of interest</h3>
-{include file="ui/topic_hierarchy.tpl"}
+  <div class="col minor">
+    
+    <h3>In the news...</h3>
 
-<h3>Scheduled events</h3>
+    {include file="message/listing.tpl"}
 
-<table>
-<tr>
-  <th>Event name</th>
-  <th>Description</th>
-  <th>Date</th>
-</tr>
-{foreach $events as $e}
-<tr>
-  <td><a href="{sems_event_url($conf.conference_id,$e.event_id)}">{$e.title}</a></td><td>{$e.description}</td><td>{sems_datetime($e.start_date)}</td>
-</tr>
-{foreachelse}
-<tr><td>Sorry, no events have been scheduled yet.</td></tr>
-{/foreach}
-</table>
+  </div>
+
+  <div class="col major">
+
+    <h3>Scheduled events</h3>
+
+    <dl>
+    {foreach $events as $e}
+      <dt><a href="{sems_event_url($conf.conference_id,$e.event_id)}">{$e.title}</a></dt>
+      <dd>
+        <span class="datetime">{sems_datetime($e.start_date)} to {sems_datetime($e.end_date)}</span>
+        {$e.description|truncate:60:'...'}</dd>
+    {/foreach}
+    </dl>
+  </div>
+
+  <div class="col minor">
+
+    <h3>Conference chair</h3>
+    <a href="{sems_profile_url($chair->UserId)}">{$chair->fullname()}</a>
+
+    <h3>Topics of interest</h3>
+    {include file="ui/topic_hierarchy.tpl"}
+  </div>
+</div>
+<div></div>
+
 {/block}

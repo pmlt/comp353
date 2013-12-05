@@ -240,6 +240,9 @@ header {
   padding: 0px 5px 0px 5px;
   /* border-right: solid 1px {$colors.border}; */
 }
+#content .three-columns-layout .col.minor { width: 25%; }
+#content .three-columns-layout .col.major { width: 40%; }
+
 
 #content .three-columns-layout + * {
   clear: both;
