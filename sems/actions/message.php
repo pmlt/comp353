@@ -26,7 +26,7 @@ function sems_message($cid, $eid, $mid) {
         sems_bc_event($conf, $event),
         sems_bc_message($conf, $event, $message)),
       'actions' => array_merge(
-        sems_event_actions($conf, $event), 
+        sems_event_actions($conf, $event, $committee), 
         sems_actions(
           sems_action_edit_message($conf, $event, $message))));
     return ok(sems_smarty_fetch('message/details.tpl', $vars));
@@ -80,7 +80,6 @@ function sems_messages_create($cid, $eid) {
       sems_bc_conference($conf),
       sems_bc_event($conf, $event),
       sems_bc('Post a new message', sems_messages_create_url($cid, $eid)));
-    $vars['actions'] = sems_event_actions($conf, $event);
     return ok(sems_smarty_fetch('message/create.tpl', $vars));
   });
 }

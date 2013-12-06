@@ -44,7 +44,7 @@ function get_paper_conditions($event, $committee, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   $must_belong_to_event = qeq('event_id', $event['event_id']);
   $must_be_published = qcond('<=', 'publish_date', date('Y-m-d H:i:s', sems_time()));
-  if (in_array($identity->UserId, $committee)) {
+  if (in_array($identity->UserId, $committee) || $event['chair_id'] == $identity->UserId) {
     return $must_belong_to_event;
   }
   else {
