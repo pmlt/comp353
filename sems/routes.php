@@ -7,8 +7,8 @@ include 'actions/message.php';
 include 'actions/paper.php';
 include 'actions/review.php';
 
-define('SEMS_ROOT', '/comp353');
-$HTTP_ROOT = '/comp353';
+define('SEMS_ROOT', '/~p_milot');
+$HTTP_ROOT = '/~p_milot';
 
 function sems_routes() {
   global $HTTP_ROOT;

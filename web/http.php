@@ -12,7 +12,7 @@ class HttpResult {
   }
   
   public function send() {
-    http_response_code($this->code);
+    //http_response_code($this->code);
     foreach ($this->headers as $h) header($h);
     echo $this->body;
   }

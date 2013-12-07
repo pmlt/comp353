@@ -179,13 +179,23 @@ function valid_upload($value) {
 }
 
 function valid_pdf($value) {
-  $file = exec('file ' . escapeshellarg($_FILES['file']['tmp_name']));
-  if (FALSE !== strpos('PDF document', $file)) {
+  // Cannot invoke file on Concordia server; fall back to extension detection.
+  $ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+  if ($ext == 'pdf') {
     return array(true, $value);
   }
   else {
-    return array(false, "File is not a PDF: {$file}");
+    return array(false, "File {$_FILES['file']['name']} is not a PDF.");
   }
+
+  //Here is the original detection logic
+  $file = exec('file ' . escapeshellarg($_FILES['file']['tmp_name']), $output);
+  foreach ($output as $line) {
+    if (FALSE !== strpos($line, 'PDF document')) {
+      return array(true, $value);
+    }
+  }
+  return array(false, "File {$_FILES['file']['name']} is not a PDF: '{$file}'");
 }
 
 function valid_boolean($value) {
