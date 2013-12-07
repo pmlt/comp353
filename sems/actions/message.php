@@ -50,6 +50,7 @@ function sems_messages_create($cid, $eid) {
     $vars['conf'] = $conf;
     $vars['event'] = $event;
     if (count($_POST) > 0) {
+      if (!isset($_POST['is_public'])) $_POST['is_public'] = false;
       $rules = array(
         'publish_date' => array('required', 'valid_date'),
         'is_public' => array('valid_boolean'),
