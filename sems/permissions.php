@@ -26,13 +26,14 @@ function can_manage_committee($event, Identity $identity=null) {
   return $event['chair_id'] == $identity->UserId;
 }
 
-function can_submit_papers($event, $identity=null) {
+function can_submit_papers($event, $committee, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   if ('submit' != sems_event_state($event)) return false; // Can only submit in the right period
-  return $event['chair_id'] != $identity->UserId;
+  if ($identity->UserId <= 0) return false;
+  return $event['chair_id'] != $identity->UserId && !in_array($identity->UserId, $committee);
 }
 
-function can_view_paper($event, $paper, $committee, $identity=null) {
+function can_view_paper($event, $paper, array $committee, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   if ($event['chair_id'] == $identity->UserId) return true; //Chair can always view
   if (in_array($identity->UserId, $committee)) return true; //Committee members can always view
@@ -64,7 +65,7 @@ function get_message_conditions($event, $committee, $identity=null) {
   if (!$identity) $identity = sems_get_identity();
   $must_belong_to_event = qeq('event_id', $event['event_id']);
   $must_be_published = qcond('<=', 'publish_date', date('Y-m-d H:i:s', sems_time()));
-  if (!in_array($identity->UserId, $committee)) {
+  if (!in_array($identity->UserId, $committee) && $event['chair_id'] != $identity->UserId) {
     return qand(array(qeq('is_public', '1'), $must_be_published, $must_belong_to_event));
   }
   else return qand(array($must_be_published, $must_belong_to_event));
@@ -161,8 +162,8 @@ function sems_action_manage_committee($conf, $event) {
     'url' => sems_event_committee_url($conf['conference_id'], $event['event_id']));
 }
 
-function sems_action_submit_paper($conf, $event) {
-  if (!can_submit_papers($event)) return null;
+function sems_action_submit_paper($conf, $event, $committee) {
+  if (!can_submit_papers($event, $committee)) return null;
   return array(
     'label' => 'Submit a paper for this event',
     'url' => sems_papers_submit_url($conf['conference_id'], $event['event_id']));

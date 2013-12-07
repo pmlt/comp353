@@ -4,11 +4,11 @@ function sems_message_url($cid, $eid, $mid) { return sems_messages_url($cid, $ei
 function sems_message($cid, $eid, $mid) {
   return sems_db(function($db) use($cid, $eid, $mid) {
     $conf = get_conference($db, $cid);
-    $event = get_event($db, $cid, $mid);
+    $event = get_event($db, $cid, $eid);
     $message = get_message($db, $mid);
     if (!$conf || !$event || !$message) return sems_notfound();
 
-    $committee = get_event_committee_ids($db, $event);
+    $committee = get_event_committee_ids($db, $eid);
     if (!can_view_message($event, $message, $committee)) {
       return sems_forbidden("You may not view this message's details.");
     }

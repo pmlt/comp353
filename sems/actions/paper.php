@@ -10,7 +10,8 @@ function sems_papers_submit($cid, $eid) {
     $conf = get_conference($db, $cid);
     if (!$event || !$conf) return sems_notfound();
 
-    if (!can_submit_papers($event)) {
+    $committee = get_event_committee_ids($db, $eid);
+    if (!can_submit_papers($event, $committee)) {
       return new sems_forbidden("You may not submit new papers for this event at this time.");
     }
 
@@ -19,12 +20,13 @@ function sems_papers_submit($cid, $eid) {
     $vars['conf'] = $conf;
 
     if (count($_POST) > 0) {
+      $_POST['file'] = 'file'; //Little trick to make sure validation triggers for uploads
       $rules = array(
         'title' => array('required'),
         'abstract' => array('required'),
         'keywords' => array('required'),
         'authors' => array('valid_user_references'),
-        'file' => array('valid_upload', 'valid_pdf'));
+        'file' => array('required', 'valid_upload', 'valid_pdf'));
       list($success, $data) = sems_validate($_POST, $rules, $errors);
       if ($success) {
         $rev_date = date('Y-m-d H:i:s');
@@ -43,7 +45,7 @@ function sems_papers_submit($cid, $eid) {
           $moved = move_uploaded_file($_FILES['file']['tmp_name'], SEMS_UPLOADS."/".sems_paper_filename($paper_id, $rev_date));
           if ($moved) {
             insert($db, "INSERT INTO PaperVersion (paper_id,revision_date) VALUES(?,?)", array($paper_id, $rev_date));
-            sems_save_user_selection($db, 'PaperAuthor', 'paper_id', $paper_id, array_merge($data['authors'], array($data['submitter_id'])));
+            sems_save_user_selection($db, 'PaperAuthor', 'paper_id', $paper_id, array_merge((array)$data['authors'], array($data['submitter_id'])));
             sems_save_topics($db, 'PaperTopic', 'paper_id', $paper_id, $_POST);
             return found(sems_paper_url($cid, $eid, $paper_id));
           }
@@ -62,7 +64,7 @@ function sems_papers_submit($cid, $eid) {
       sems_bc_conference($conf),
       sems_bc_event($conf, $event),
       sems_bc('Submit a new paper', sems_papers_submit_url($cid, $eid)));
-    $vars['actions'] = sems_event_actions($conf, $event);
+    $vars['actions'] = sems_event_actions($conf, $event, $committee);
     return ok(sems_smarty_fetch('paper/submit.tpl', $vars));
   });
 }
@@ -160,11 +162,12 @@ function sems_paper($cid, $eid, $pid) {
     $paper = get_paper($db, $pid);
     if (!$conf || !$event || !$paper) return sems_notfound();
 
+    $committee = get_event_committee_ids($db, $event);
     if (!can_view_paper($event, $paper, $committee)) {
       return sems_forbidden("You may not view this paper at this time.");
     }
 
-    $actions = sems_event_actions($conf, $event);
+    $actions = sems_event_actions($conf, $event, $committee);
     // Try to find a review assignment for current user
     $ident = sems_get_identity();
     if ($ident->UserId > 0) {

@@ -100,8 +100,6 @@ function sems_save_topics(mysqli $db, $table, $id_field, $id, $post) {
   foreach ($post as $postname => $value) {
     if (0 === strpos($postname, 'topic_') && $value > 0) {
       list($sql,$params) = generate_insert($db, $table, array('topic_id',$id_field), array('topic_id' => $value, $id_field => $id));
-      error_log($sql);
-      error_log(print_r($params, 1));
       insert($db, $sql, $params);
     }
   }

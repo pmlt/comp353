@@ -124,7 +124,7 @@ function sems_event_edit($cid, $eid) {
     }
 
     $chair = sems_create_identity($db, $event['chair_id']);
-    $conf['chair_email'] = $chair->UserData['email'];
+    $event['chair_email'] = $chair->UserData['email'];
 
     $committee = get_event_committee_ids($db, $eid);
 
@@ -300,7 +300,7 @@ function sems_event_actions($conf, $event, $committee) {
   return sems_actions(
     sems_action_edit_event($conf, $event),
     sems_action_manage_committee($conf, $event),
-    sems_action_submit_paper($conf, $event),
+    sems_action_submit_paper($conf, $event, $committee),
     sems_action_post_message($conf, $event),
     sems_action_bid($conf, $event, $committee),
     sems_action_assign($conf, $event),
