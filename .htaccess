@@ -1,8 +1,8 @@
 Options +FollowSymLinks
-IndexIgnore */*
+#IndexIgnore */*
 RewriteEngine On
 
-RewriteBase /comp353
+RewriteBase /~p_milot
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?__X_REQUEST_URI__=$1 [QSA,L]
