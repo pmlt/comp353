@@ -168,7 +168,7 @@ CREATE TABLE `User` (
   `date_created` DATETIME NOT NULL,
   `title` ENUM('mr','ms','mrs','dr') NOT NULL,
   `first_name` TEXT NOT NULL,
-  `middle_name` TEXT NOT NULL,
+  `middle_name` TEXT DEFAULT NULL,
   `last_name` TEXT NOT NULL,
   `country_id` CHAR(2) NOT NULL,
   `organization_id` INT(11) NOT NULL,

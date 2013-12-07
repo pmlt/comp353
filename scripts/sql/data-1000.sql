@@ -1,3 +1,5 @@
+SET NAMES 'utf8';
+
 INSERT INTO `Topic` VALUES
 (1, 'Compiler Techniques', 'Computer Science'),
 (2, 'Language Theory', 'Computer Science'),
@@ -281,7 +283,7 @@ INSERT INTO User VALUES
 (9, NOW(), 'dr', 'Benoit', 'B.', 'Beauséjour', 'CA', 10, 'Programmer', NULL, NULL, NULL, NULL, 'bbeausej@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
 (10, NOW(), 'mrs', 'Alice', '', 'Burger', 'CA', 10, 'Content manager', NULL, NULL, NULL, NULL, 'aburger@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
 (11, NOW(), 'mr', 'Félix', 'F.', 'Courtemanche', 'CA', 10, 'Programmer', NULL, NULL, NULL, NULL, 'fcourtemanche@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
-(12, NOW(), 'mrs', 'Claire', '', 'Buffer', 'CA', 10, 'Director of Production', NULL, NULL, NULL, NULL, 'cbuffet@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
+(12, NOW(), 'mrs', 'Claire', '', 'Buffet', 'CA', 10, 'Director of Production', NULL, NULL, NULL, NULL, 'cbuffet@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
 (13, NOW(), 'ms', 'Anne-Marie', 'M.', 'Champoux', 'CA', 10, 'Content manager', NULL, NULL, NULL, NULL, 'amchampoux@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
 (14, NOW(), 'dr', 'Marc', 'E.', 'Beaudet', 'CA', 10, 'President', NULL, NULL, NULL, NULL, 'mbeaudet@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL),
 (15, NOW(), 'mr', 'Marc', '', 'Cholette', 'CA', 10, 'Project Lead', NULL, NULL, NULL, NULL, 'mcholette@turbulent.ca', '05fe7461c607c33229772d402505601016a7d0ea', b'1', NULL);
